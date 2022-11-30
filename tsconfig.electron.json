@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist/gswitcher",
+        "sourceMap": false,
+        "allowSyntheticDefaultImports": true,
+        "module": "commonjs"
+    },
+    "include": [
+        "./src/electron/*"
+    ]
+}

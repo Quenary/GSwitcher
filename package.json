@@ -4,9 +4,17 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start-electron-ts": "ng build --base-href ./ && tsc -b tsconfig.electron.json && electron ./dist/gswitcher/electron-app.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false,
+    "assert": false,
+    "util": false
   },
   "private": true,
   "dependencies": {
@@ -15,10 +23,21 @@
     "@angular/compiler": "^15.0.0",
     "@angular/core": "^15.0.0",
     "@angular/forms": "^15.0.0",
+    "@angular/material": "^15.0.0",
     "@angular/platform-browser": "^15.0.0",
     "@angular/platform-browser-dynamic": "^15.0.0",
     "@angular/router": "^15.0.0",
+    "@nodert-win11/windows.devices.display": "^0.1.6",
+    "@nodert-win11/windows.devices.enumeration": "^0.1.6",
+    "@nodert-win11/windows.devices.geolocation": "^0.1.6",
+    "bufferutil": "^4.0.7",
+    "ffi-napi": "^4.0.3",
+    "ref-array-napi": "^1.2.2",
+    "ref-napi": "^3.0.3",
+    "ref-struct-di": "^1.1.1",
+    "ref-struct-napi": "^1.1.1",
     "rxjs": "~7.5.0",
+    "systeminformation": "^5.14.4",
     "tslib": "^2.3.0",
     "zone.js": "~0.12.0"
   },
@@ -26,13 +45,16 @@
     "@angular-devkit/build-angular": "^15.0.0",
     "@angular/cli": "~15.0.0",
     "@angular/compiler-cli": "^15.0.0",
+    "@electron/rebuild": "^3.2.10",
     "@types/jasmine": "~4.3.0",
+    "electron": "^19.1.6",
     "jasmine-core": "~4.5.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
+    "supervisor": "^0.12.0",
     "typescript": "~4.8.2"
   }
 }

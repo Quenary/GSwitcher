@@ -8,7 +8,7 @@ declare global {
                 chrome: () => string,
                 electron: () => string
             },
-            invoke: <T = any>(name: string, args?: any[]) => Promise<T>
+            invoke: <T = any>(name: string, ...args: any[]) => Promise<T>
         }
     }
 }

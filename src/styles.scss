@@ -1,1 +1,27 @@
-/* You can add global styles to this file, and also import other style files */
+@import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
+@font-face {
+    font-family: "Lato";
+    src: local("Lato"), url("./assets//fonts/Lato/Lato-Regular.ttf");
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Lato";
+    src: local("Lato"), url("./assets//fonts/Lato/Lato-Bold.ttf");
+    font-weight: 700;
+    font-style: bold;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: "Lato";
+    font-style: normal;
+    font-weight: 400;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}

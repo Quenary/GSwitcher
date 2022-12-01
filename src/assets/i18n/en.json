@@ -1,0 +1,16 @@
+{
+    "MAIN": {
+        "TITLE": "GSwitcher",
+        "FIELDS": {
+            "DISPLAYS": "Displays",
+            "PROCESS": {
+                "ADD": "Add process",
+                "FROM_LIST": "From list",
+                "FROM_FILE": "From file"
+            },
+            "BRIGHTNESS": "Brightness",
+            "CONTRAST": "Contrast",
+            "GAMMA": "Gamma"
+        }
+    }
+}

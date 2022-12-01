@@ -1,0 +1,16 @@
+{
+    "MAIN": {
+        "TITLE": "GSwitcher",
+        "FIELDS": {
+            "DISPLAYS": "Мониторы",
+            "PROCESS": {
+                "ADD": "Добавить процесс",
+                "FROM_LIST": "Из списка",
+                "FROM_FILE": "Из файла"
+            },
+            "BRIGHTNESS": "Яркость",
+            "CONTRAST": "Контрастность",
+            "GAMMA": "Гамма"
+        }
+    }
+}

@@ -4,7 +4,9 @@
         "outDir": "dist/gswitcher",
         "sourceMap": false,
         "allowSyntheticDefaultImports": true,
-        "module": "commonjs"
+        "module": "commonjs",
+        "strictNullChecks": false,
+        "noImplicitAny": false,
     },
     "include": [
         "./src/electron/*"

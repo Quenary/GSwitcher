@@ -6,11 +6,11 @@
  * @returns target return / fallback return.
  */
 export function isElectron(fallback?: Function) {
-    return function isElectron(target: any, propertyKey: string, descriptor: any) {
+    return function isElectron(target: Object, propertyKey: string, descriptor: any) {
         const original = descriptor.value;
         descriptor.value = function (...args) {
             if (!window.electron) {
-                console.warn(`property ${propertyKey} of ${this?.prototype?.name} decorated with @isElectron cannot be called because electron is missing in global object.`);
+                console.warn(`${this?.constructor?.name}[${propertyKey}] decorated with @isElectron cannot be called because electron is missing in global object.`);
                 return !!fallback
                     ? fallback(args)
                     : null;

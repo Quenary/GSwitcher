@@ -1,3 +1,5 @@
+import type { EInvokeEventName } from "./electron/electron-enums";
+
 export { };
 
 declare global {
@@ -8,7 +10,7 @@ declare global {
                 chrome: () => string,
                 electron: () => string
             },
-            invoke: <T = any>(name: string, ...args: any[]) => Promise<T>
+            invoke: <T = any>(name: EInvokeEventName, ...args: any[]) => Promise<T>
         }
     }
 }

@@ -3,11 +3,20 @@ import * as url from 'url';
 import * as path from 'path';
 import { GSwitcherGDI32Wrapper } from './gswitcher-gdi32-wrapper';
 import { graphics } from 'systeminformation'
-import { GSwitcherStorage } from './gswitcher-storage';
+import { GSwitcherStorage, IGSwitcherConfig } from './gswitcher-storage';
 import { GSwitcherEventHandler } from './gswitcher-event-handler';
+import { EInvokeEventName } from './electron-enums';
 const { snapshot } = require('process-list');
 
 let mainWindow: BrowserWindow | null;
+const gswitcherStorage = new GSwitcherStorage();
+const gswitcherGDI32Wrapper = new GSwitcherGDI32Wrapper();
+const gswitcherEventHandler = new GSwitcherEventHandler(
+    gswitcherGDI32Wrapper,
+    gswitcherStorage,
+    1000
+);
+gswitcherEventHandler.init();
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -33,18 +42,8 @@ function createWindow() {
 }
 
 function prepareHandlers() {
-
-    // const gdi32Wrapper = new GSwitcherGDI32Wrapper();
-    // const storage = new GSwitcherStorage();
-    const gswitcherStorage = new GSwitcherStorage();
-    const gswitcherGDI32Wrapper = new GSwitcherGDI32Wrapper();
-    const gswitcherEventHandler = new GSwitcherEventHandler(
-        gswitcherGDI32Wrapper,
-        gswitcherStorage,
-        5000
-    );
     ipcMain.handle(
-        'gswitcher:set-displays',
+        EInvokeEventName['gswitcher:set-displays'],
         (
             event: IpcMainInvokeEvent,
             displays: string[]
@@ -53,7 +52,7 @@ function prepareHandlers() {
         }
     )
     ipcMain.handle(
-        'gswitcher:set-application-config',
+        EInvokeEventName['gswitcher:set-application-config'],
         (
             event: IpcMainInvokeEvent,
             appName: string,
@@ -72,25 +71,42 @@ function prepareHandlers() {
         }
     )
     ipcMain.handle(
-        'gswitcher:get-displays-list',
+        EInvokeEventName['gswitcher:get-displays-list'],
         async () => {
             const info = await graphics();
             return info.displays.map(item => item.deviceName)
         }
     );
     ipcMain.handle(
-        'gswitcher:get-process-list',
+        EInvokeEventName['gswitcher:get-process-list'],
         async () => {
             const list: { name: string, owner: string }[] = await snapshot('name', 'owner');
             return list
                 .filter(item => item.name.includes('.exe') && !!item.owner)
                 .map(item => item.name);
         }
+    );
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:get-config'],
+        () => gswitcherStorage.getConfig()
+    )
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:set-config'],
+        (
+            event: IpcMainInvokeEvent,
+            config: IGSwitcherConfig
+        ) => gswitcherStorage.setConfig(config)
     )
 }
 
 app.on('ready', createWindow);
 app.on('window-all-closed', function () {
+    gswitcherEventHandler.stop();
+    const rampValues = gswitcherGDI32Wrapper.calculateRampValues();
+    const ramp = gswitcherGDI32Wrapper.getFlatRamp(rampValues);
+    gswitcherStorage.getConfig().displays.forEach(display => {
+        gswitcherGDI32Wrapper.setDeviceGammaRamp(display, ramp)
+    });
     if (process.platform !== 'darwin') {
         app.quit();
     }

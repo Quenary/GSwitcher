@@ -1,4 +1,4 @@
-import { interval, Subject, takeUntil } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import * as activeWin from 'active-win';
 import { GSwitcherGDI32Wrapper } from './gswitcher-gdi32-wrapper';
 import { GSwitcherStorage } from './gswitcher-storage';
@@ -11,7 +11,7 @@ import { GSwitcherStorage } from './gswitcher-storage';
  */
 export class GSwitcherEventHandler {
 
-    private readonly destroy$ = new Subject<void>();
+    private intervalSubsctiption: Subscription;
     private activeOwnerFileName: string = null;
 
     /**
@@ -27,43 +27,47 @@ export class GSwitcherEventHandler {
     ) { }
 
     public init() {
-        interval(this.checkInterval)
-            .pipe(takeUntil(this.destroy$))
+        this.intervalSubsctiption?.unsubscribe();
+        this.intervalSubsctiption = interval(this.checkInterval)
             .subscribe(() => {
                 activeWin().then(res => {
                     const path = res.owner.path;
                     const ownerFileName = res.owner.path.substring(
-                        path.lastIndexOf('\\\\'),
+                        path.lastIndexOf('\\') + 1,
                         path.length
                     );
-                    if (this.activeOwnerFileName !== ownerFileName) {
-                        this.activeOwnerFileName = ownerFileName;
-                        const config = this.gswitcherStorage.getConfig();
-                        const appConfig = config?.applications[this.activeOwnerFileName];
-                        const displays = config?.displays;
-
-                        if (!!appConfig && displays?.length) {
-                            const rampValues = this.gswitcherGdi32Wrapper.calculateRampValues(
-                                appConfig.brightness,
-                                appConfig.contrast,
-                                appConfig.gamma
-                            );
-                            const ramp = this.gswitcherGdi32Wrapper.getFlatRamp(rampValues);
-                            displays.forEach(display => {
-                                this.gswitcherGdi32Wrapper.setDeviceGammaRamp(
-                                    display,
-                                    ramp
-                                );
-                            });
-                        }
+                    const config = this.gswitcherStorage.getConfig();
+                    const displays = config?.displays;
+                    if (this.activeOwnerFileName === ownerFileName ||
+                        !config ||
+                        !displays?.length) {
+                        return;
                     }
+
+                    console.log('changing for ', ownerFileName)
+                    this.activeOwnerFileName = ownerFileName;
+                    const appConfig = config.applications[this.activeOwnerFileName];
+
+                    const rampValues = !!appConfig
+                        ? this.gswitcherGdi32Wrapper.calculateRampValues(
+                            appConfig.brightness,
+                            appConfig.contrast,
+                            appConfig.gamma
+                        )
+                        : this.gswitcherGdi32Wrapper.calculateRampValues();
+                    const ramp = this.gswitcherGdi32Wrapper.getFlatRamp(rampValues);
+                    displays.forEach(display => {
+                        this.gswitcherGdi32Wrapper.setDeviceGammaRamp(
+                            display,
+                            ramp
+                        );
+                    });
                 })
             });
     }
 
-    public destroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
+    public stop() {
+        this.intervalSubsctiption?.unsubscribe();
     }
 }
 

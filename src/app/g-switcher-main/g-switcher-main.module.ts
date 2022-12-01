@@ -9,6 +9,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar'
 
 @NgModule({
   declarations: [
@@ -24,7 +28,11 @@ import { MatMenuModule } from '@angular/material/menu';
     MatSelectModule,
     TranslateModule,
     MatProgressSpinnerModule,
-    MatMenuModule
+    MatMenuModule,
+    MatChipsModule,
+    MatDividerModule,
+    MatIconModule,
+    MatProgressBarModule
   ]
 })
 export class GSwitcherMainModule { }

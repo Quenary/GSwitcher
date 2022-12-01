@@ -12,7 +12,7 @@
                 <mat-label>{{'MAIN.FIELDS.DISPLAYS' | translate}}</mat-label>
                 <mat-select [formControl]="displaysControl"
                             multiple>
-                    <mat-option *ngFor="let item of displays"
+                    <mat-option *ngFor="let item of displaysList"
                                 [value]="item">{{item}}
                     </mat-option>
                 </mat-select>
@@ -27,13 +27,38 @@
                             [matMenuTriggerFor]="menu">
                         {{'MAIN.FIELDS.PROCESS.FROM_LIST' | translate}}
                     </button>
-                    <button mat-button>
+                    <button mat-button
+                            (click)="fileInput.click()">
                         {{'MAIN.FIELDS.PROCESS.FROM_FILE' | translate}}
+                        <input hidden
+                               type="file"
+                               id="file"
+                               accept=".exe"
+                               #fileInput
+                               (change)="setApplicationFromFile($event)">
                     </button>
                 </div>
             </div>
 
+            <mat-chip-listbox [formControl]="$any(form.controls.appName)">
+                <mat-chip-option *ngFor="let item of applications$ | async"
+                                 [selected]="item === form.controls.appName.value"
+                                 [value]="item"
+                                 (removed)="removeApplication(item)">
+                    {{item}}
+                    <button matChipRemove
+                            [attr.aria-label]="'remove ' + item">
+                        <mat-icon>cancel</mat-icon>
+                    </button>
+                </mat-chip-option>
+            </mat-chip-listbox>
+
         </div>
+
+        <mat-divider [vertical]="true"
+                     class="gswitcher-main-body-divider">
+        </mat-divider>
+
         <div class="gswitcher-main-body-right">
 
             <div class="gswitcher-main-body-item">
@@ -79,12 +104,15 @@
             </div>
         </div>
     </div>
+
+    <mat-progress-bar [value]="saveConfigIntervalProgress">
+    </mat-progress-bar>
 </div>
 
 <mat-menu #menu>
     <button mat-menu-item
             *ngFor="let item of processList"
-            (click)="selectProcessFromList(item)">
+            (click)="changeValue(item,'appName')">
         {{item}}
     </button>
 </mat-menu>

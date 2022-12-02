@@ -29,14 +29,21 @@
                     {{'MAIN.FIELDS.PROCESS.ADD' | translate}}
                 </div>
                 <div class="gswitcher-main-body-item-field flex">
-                    <mat-form-field class="search-process">
+                    <mat-form-field class="search-processes"
+                                    (click)="onClickProcessesInput()">
                         <input matInput
-                               #processFromListInput
+                               #processesListInput
                                [formControl]="searchApplicationControl"
                                [placeholder]="'MAIN.FIELDS.PROCESS.FROM_LIST' | translate"
                                [matAutocomplete]="auto">
                         <mat-autocomplete #auto="matAutocomplete"
-                                          (optionSelected)="setApplicationFromList($event)">
+                                          (optionSelected)="setApplicationFromList($event)"
+                                          (closed)="onClosedAutocomplete()">
+                            <mat-option *ngIf="isLoadingProcesses$ | async"
+                                        [style.justify-content]="'center'"
+                                        [disabled]="true">
+                                <mat-spinner></mat-spinner>
+                            </mat-option>
                             <mat-option *ngFor="let item of filteredProcesses$ | async"
                                         [value]="item">
                                 {{item}}

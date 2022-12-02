@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, debounceTime, forkJoin, from, map, Observable, of, skip, startWith, Subject, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, forkJoin, from, map, Observable, of, skip, startWith, Subject, takeUntil, tap } from 'rxjs';
 import { isElectron } from '../decorators/electron.decorator';
 import type { IGSwitcherConfig, IGSwitcherConfigApplication } from 'src/electron/gswitcher-storage';
 import { EInvokeEventName } from 'src/electron/electron-enums';
@@ -34,10 +34,6 @@ export class GSwitcherMainComponent
    */
   public displaysList: string[];
   /**
-   * List of active processes
-   */
-  private processList: string[];
-  /**
    * Current config
    */
   public readonly config$ = new BehaviorSubject<IGSwitcherConfig>(null);
@@ -65,20 +61,33 @@ export class GSwitcherMainComponent
    */
   public readonly searchApplicationControl = new FormControl(null);
   /**
+   * List of active processes
+   */
+  public readonly processesList$ = new BehaviorSubject<string[]>([]);
+  /**
    * Filtered process list
    */
-  public readonly filteredProcesses$ = this.searchApplicationControl.valueChanges
+  public readonly filteredProcesses$ = combineLatest([
+    this.searchApplicationControl.valueChanges.pipe(startWith(null)),
+    this.processesList$.pipe(map(list => list ?? []))
+  ])
     .pipe(
-      startWith(null),
-      map((value: string) => {
-        if (!value) {
-          return this.processList;
+      map(([search, list]: [string, string[]]) => {
+        if (!search) {
+          return list;
         }
-        const lowerValue = value.toLowerCase();
-        return this.processList?.filter(item => item.toLocaleLowerCase().includes(lowerValue));
+        const lowerValue = search.toLowerCase();
+        return list.filter(item => item.toLocaleLowerCase().includes(lowerValue));
       })
     );
+  /**
+   * Loading flag
+   */
   public readonly isLoading$ = new BehaviorSubject<boolean>(false);
+  /**
+   * Loading processes list flag
+   */
+  public readonly isLoadingProcesses$ = new BehaviorSubject<boolean>(false);
   /**
    * Destroy observable to manage subscriptions
    */
@@ -93,12 +102,9 @@ export class GSwitcherMainComponent
     this.isLoading$.next(true);
     forkJoin([
       this.getDisplaysList(),
-      this.getProcessList(),
       this.getConfig()
-    ]).subscribe(([displays, processes, config]) => {
-      console.log(displays, processes, config)
+    ]).subscribe(([displays, config]) => {
       this.displaysList = displays;
-      this.processList = processes;
       this.config$.next(config);
       this.searchApplicationControl.setValue(null);
       this.displaysControl.setValue(
@@ -265,8 +271,8 @@ export class GSwitcherMainComponent
   }
 
   public setApplicationFromList(e: MatAutocompleteSelectedEvent) {
-    this.changeValue(e.option.value, 'appName');
     this.searchApplicationControl.setValue(null);
+    this.changeValue(e.option.value, 'appName');
   }
 
   /**
@@ -283,5 +289,20 @@ export class GSwitcherMainComponent
     delete config.applications[appName];
     this.config$.next(config);
     this.changeValue(null, 'appName');
+  }
+
+  public onClickProcessesInput() {
+    this.processesList$.next(null);
+    this.isLoadingProcesses$.next(true);
+    from(this.getProcessList())
+      .subscribe(res => {
+        this.processesList$.next(res);
+        this.isLoadingProcesses$.next(false);
+      });
+  }
+
+  public onClosedAutocomplete() {
+    this.processesList$.next(null);
+    this.isLoadingProcesses$.next(false);
   }
 }

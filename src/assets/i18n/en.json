@@ -1,4 +1,7 @@
 {
+    "COMMON": {
+        "LOADING": "Loading"
+    },
     "MAIN": {
         "TITLE": "GSwitcher",
         "FIELDS": {

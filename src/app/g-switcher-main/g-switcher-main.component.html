@@ -19,17 +19,30 @@
             </mat-form-field>
 
             <div class="gswitcher-main-body-item">
-                <div class="gswitcher-main-body-item-label">
+                <div class="gswitcher-main-body-item-label left">
                     {{'MAIN.FIELDS.PROCESS.ADD' | translate}}
                 </div>
                 <div class="gswitcher-main-body-item-field flex">
-                    <button mat-button
-                            [matMenuTriggerFor]="menu">
-                        {{'MAIN.FIELDS.PROCESS.FROM_LIST' | translate}}
-                    </button>
-                    <button mat-button
+                    <mat-form-field class="search-process">
+                        <input matInput
+                               #processFromListInput
+                               [formControl]="searchApplicationControl"
+                               [placeholder]="'MAIN.FIELDS.PROCESS.FROM_LIST' | translate"
+                               [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete"
+                                          (optionSelected)="setApplicationFromList($event)">
+                            <mat-option *ngFor="let item of filteredProcesses$ | async"
+                                        [value]="item">
+                                {{item}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+
+                    <button mat-fab
+                            color="accent"
+                            [title]="'MAIN.FIELDS.PROCESS.FROM_FILE' | translate"
                             (click)="fileInput.click()">
-                        {{'MAIN.FIELDS.PROCESS.FROM_FILE' | translate}}
+                        <mat-icon>note_add</mat-icon>
                         <input hidden
                                type="file"
                                id="file"
@@ -40,8 +53,10 @@
                 </div>
             </div>
 
-            <mat-chip-listbox [formControl]="$any(form.controls.appName)">
+            <mat-chip-listbox class="gswitcher-main-body-left-applications"
+                              [formControl]="$any(form.controls.appName)">
                 <mat-chip-option *ngFor="let item of applications$ | async"
+                                 color="accent"
                                  [selected]="item === form.controls.appName.value"
                                  [value]="item"
                                  (removed)="removeApplication(item)">
@@ -52,7 +67,6 @@
                     </button>
                 </mat-chip-option>
             </mat-chip-listbox>
-
         </div>
 
         <mat-divider [vertical]="true"
@@ -60,44 +74,49 @@
         </mat-divider>
 
         <div class="gswitcher-main-body-right">
-
             <div class="gswitcher-main-body-item">
-                <div class="gswitcher-main-body-item-label">
+                <div class="gswitcher-main-body-item-label slider">
                     {{'MAIN.FIELDS.BRIGHTNESS' | translate}}
                 </div>
-                <mat-slider class="gswitcher-main-body-item-field"
+                <mat-slider class="gswitcher-main-body-item-field slider"
+                            color="primary"
                             min="0"
                             max="1"
                             step="0.01"
-                            discrete>
+                            discrete
+                            [disabled]="!form.controls.appName.value">
                     <input matSliderThumb
                            [formControl]="$any(form.controls.brightness)">
                 </mat-slider>
             </div>
 
             <div class="gswitcher-main-body-item">
-                <div class="gswitcher-main-body-item-label">
+                <div class="gswitcher-main-body-item-label slider">
                     {{'MAIN.FIELDS.CONTRAST' | translate}}
                 </div>
-                <mat-slider class="gswitcher-main-body-item-field"
+                <mat-slider class="gswitcher-main-body-item-field slider"
+                            color="primary"
                             min="0"
                             max="1"
                             step="0.01"
-                            discrete>
+                            discrete
+                            [disabled]="!form.controls.appName.value">
                     <input matSliderThumb
                            [formControl]="$any(form.controls.contrast)">
                 </mat-slider>
             </div>
 
             <div class="gswitcher-main-body-item">
-                <div class="gswitcher-main-body-item-label">
+                <div class="gswitcher-main-body-item-label slider">
                     {{'MAIN.FIELDS.GAMMA' | translate}}
                 </div>
-                <mat-slider class="gswitcher-main-body-item-field"
+                <mat-slider class="gswitcher-main-body-item-field slider"
+                            color="primary"
                             min="0.4"
                             max="2.8"
                             step="0.01"
-                            discrete>
+                            discrete
+                            [disabled]="!form.controls.appName.value">
                     <input matSliderThumb
                            [formControl]="$any(form.controls.gamma)">
                 </mat-slider>
@@ -105,14 +124,6 @@
         </div>
     </div>
 
-    <mat-progress-bar [value]="saveConfigIntervalProgress">
+    <mat-progress-bar [value]="saveProgressBarValue$ | async">
     </mat-progress-bar>
 </div>
-
-<mat-menu #menu>
-    <button mat-menu-item
-            *ngFor="let item of processList"
-            (click)="changeValue(item,'appName')">
-        {{item}}
-    </button>
-</mat-menu>

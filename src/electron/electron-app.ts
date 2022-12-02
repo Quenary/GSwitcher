@@ -20,8 +20,8 @@ gswitcherEventHandler.init();
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 1000,
+        width: 900,
+        height: 500,
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, './electron-preload.js')

@@ -13,6 +13,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar'
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar'
     MatChipsModule,
     MatDividerModule,
     MatIconModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatAutocompleteModule,
+    MatInputModule
   ]
 })
 export class GSwitcherMainModule { }

@@ -1,4 +1,5 @@
-@import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css";
+
 @font-face {
     font-family: "Lato";
     src: local("Lato"), url("./assets//fonts/Lato/Lato-Regular.ttf");
@@ -11,12 +12,20 @@
     font-weight: 700;
     font-style: bold;
 }
-
-* {
-    box-sizing: border-box;
-    font-family: "Lato";
+@font-face {
+    font-family: "Material Icons";
     font-style: normal;
     font-weight: 400;
+    src: local("Material Icons"), local("MaterialIcons-Regular"),
+        url("assets/fonts//icons/MaterialIcons-Regular.ttf") format("truetype");
+}
+
+div,
+span {
+    font-family: "Lato", "Arial";
+    font-style: normal;
+    font-weight: 400;
+    box-sizing: border-box;
 }
 
 body {
@@ -24,4 +33,29 @@ body {
     height: 100vh;
     width: 100vw;
     overflow: hidden;
+}
+
+.material-icons {
+    font-family: "Material Icons";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Support for IE. */
+    font-feature-settings: "liga";
 }

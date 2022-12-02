@@ -47,6 +47,11 @@
             justify-content: flex-start;
             width: 30%;
             height: 100%;
+            gap: 20px;
+
+            .gswitcher-main-body-left-applications {
+                padding-left: 10px;
+            }
         }
         .gswitcher-main-body-right {
             display: flex;
@@ -55,6 +60,7 @@
             justify-content: flex-start;
             flex: 1;
             height: 100%;
+            gap: 20px;
         }
 
         .gswitcher-main-body-item {
@@ -63,7 +69,6 @@
             flex-direction: column;
             align-items: flex-start;
             justify-content: flex-start;
-            padding: 10px;
             gap: 10px;
         }
         .gswitcher-main-body-item-label,
@@ -72,8 +77,26 @@
             &.flex {
                 display: flex;
                 flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 10px;
+                .search-process {
+                    flex: 1;
+                }
+            }
+            &.slider {
+                width: 90%;
+                ::ng-deep .mdc-slider__track {
+                    box-sizing: content-box;
+                }
+            }
+        }
+        .gswitcher-main-body-item-label {
+            &.left {
+                padding-left: 10px;
+            }
+            &.slider {
+                padding-left: 20px;
             }
         }
     }

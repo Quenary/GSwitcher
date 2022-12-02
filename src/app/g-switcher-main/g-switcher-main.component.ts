@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, debounceTime, from, map, Observable, of, Subject, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, debounceTime, from, map, Observable, of, startWith, Subject, takeUntil, tap } from 'rxjs';
 import { isElectron } from '../decorators/electron.decorator';
 import type { IGSwitcherConfig, IGSwitcherConfigApplication } from 'src/electron/gswitcher-storage';
 import { EInvokeEventName } from 'src/electron/electron-enums';
 import * as lodashMerge from 'lodash.merge';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 const defaultAppConfig: IGSwitcherConfigApplication = {
   brightness: 0.5,
@@ -26,7 +27,7 @@ export class GSwitcherMainComponent
   /**
    * Indicates delay before auto save config
    */
-  public saveConfigIntervalProgress: number = null;
+  public readonly saveProgressBarValue$ = new BehaviorSubject<number>(null);
   /**
    * List of connected displays
    */
@@ -34,7 +35,7 @@ export class GSwitcherMainComponent
   /**
    * List of active processes
    */
-  public processList: string[];
+  private processList: string[];
   /**
    * Current config
    */
@@ -48,11 +49,11 @@ export class GSwitcherMainComponent
   /**
    * Control of displays selection
    */
-  public displaysControl = new FormControl(null);
+  public readonly displaysControl = new FormControl(null);
   /**
    * Main form
    */
-  public form: FormGroup = new FormGroup({
+  public readonly form: FormGroup = new FormGroup({
     appName: new FormControl(null, [Validators.required]),
     brightness: new FormControl(null, [Validators.required]),
     contrast: new FormControl(null, [Validators.required]),
@@ -62,6 +63,28 @@ export class GSwitcherMainComponent
    * Destroy observable to manage subscriptions
    */
   private readonly destroy$ = new Subject<void>();
+  /**
+   * Control of search input of process list
+   */
+  public readonly searchApplicationControl = new FormControl(null);
+  /**
+   * Filtered process list
+   */
+  public readonly filteredProcesses$ = this.searchApplicationControl.valueChanges
+    .pipe(
+      startWith(null),
+      map((value: string) => {
+        if (!value) {
+          return this.processList;
+        }
+        const lowerValue = value.toLowerCase();
+        return this.processList?.filter(item => item.toLocaleLowerCase().includes(lowerValue));
+      })
+    );
+
+
+
+  constructor() { }
 
   ngOnInit(): void {
     // Patching initial default values
@@ -130,6 +153,7 @@ export class GSwitcherMainComponent
       });
     this.getDisplaysList()?.subscribe(res => {
       this.displaysList = res;
+      this.displaysControl.setValue([res?.[0]]);
     });
     this.getProcessList()?.subscribe(res => {
       this.processList = res;
@@ -143,15 +167,16 @@ export class GSwitcherMainComponent
       .pipe(
         tap(() => {
           clearInterval(interval);
-          this.saveConfigIntervalProgress = 0;
+          this.saveProgressBarValue$.next(0);
           interval = setInterval(() => {
-            if (this.saveConfigIntervalProgress >= 100) {
+            if (this.saveProgressBarValue$.getValue() >= 100) {
               clearInterval(interval);
-              this.saveConfigIntervalProgress = null;
+              this.saveProgressBarValue$.next(null);
               return;
             }
-            this.saveConfigIntervalProgress += 10;
-            console.log(this.saveConfigIntervalProgress)
+            this.saveProgressBarValue$.next(
+              this.saveProgressBarValue$.getValue() + 10
+            );
           }, configSaveInterval / 10);
         }),
         debounceTime(configSaveInterval),
@@ -210,6 +235,11 @@ export class GSwitcherMainComponent
   public setApplicationFromFile(e: any) {
     const fileName: string = e?.target?.files?.[0]?.name;
     this.changeValue(fileName, 'appName');
+  }
+
+  public setApplicationFromList(e: MatAutocompleteSelectedEvent) {
+    this.changeValue(e.option.value, 'appName');
+    this.searchApplicationControl.setValue(null);
   }
 
   /**

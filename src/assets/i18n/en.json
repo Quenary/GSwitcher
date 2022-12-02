@@ -4,7 +4,7 @@
         "FIELDS": {
             "DISPLAYS": "Displays",
             "PROCESS": {
-                "ADD": "Add process",
+                "ADD": "Add application",
                 "FROM_LIST": "From list",
                 "FROM_FILE": "From file"
             },

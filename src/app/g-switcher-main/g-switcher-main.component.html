@@ -1,4 +1,10 @@
 <div class="GSwitcherMainClass">
+    <div *ngIf="isLoading$ | async"
+         class="gswitcher-main-loading">
+        <mat-spinner class="gswitcher-main-loading-spinner">
+        </mat-spinner>
+    </div>
+
     <div class="gswitcher-main-header">
         <div class="gswitcher-main-header-title">
             {{'MAIN.TITLE' | translate}}

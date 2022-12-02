@@ -1,4 +1,13 @@
-import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
+import {
+    app,
+    BrowserWindow,
+    ipcMain,
+    IpcMainInvokeEvent,
+    shell,
+    Menu,
+    MenuItemConstructorOptions,
+    MenuItem
+} from 'electron';
 import * as url from 'url';
 import * as path from 'path';
 import { GSwitcherGDI32Wrapper } from './gswitcher-gdi32-wrapper';
@@ -7,6 +16,28 @@ import { GSwitcherStorage, IGSwitcherConfig } from './gswitcher-storage';
 import { GSwitcherEventHandler } from './gswitcher-event-handler';
 import { EInvokeEventName } from './electron-enums';
 const { snapshot } = require('process-list');
+
+const windowMenu: Array<MenuItemConstructorOptions | MenuItem> = [
+    {
+        label: 'File',
+        submenu: [
+            process.platform === 'darwin' ? { role: 'close' } : { role: 'quit' }
+        ]
+    },
+    {
+        role: 'help',
+        submenu: [
+            {
+                label: 'Learn More',
+                click: async () => {
+                    await shell.openExternal('https://github.com/Quenary/GSwitcher')
+                }
+            }
+        ]
+    }
+];
+const menu = Menu.buildFromTemplate(windowMenu)
+Menu.setApplicationMenu(menu)
 
 let mainWindow: BrowserWindow | null;
 const gswitcherStorage = new GSwitcherStorage();
@@ -20,8 +51,8 @@ gswitcherEventHandler.init();
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 900,
-        height: 500,
+        width: 960,
+        height: 720,
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, './electron-preload.js')
@@ -34,7 +65,7 @@ function createWindow() {
             slashes: true
         })
     );
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
     mainWindow.on('closed', () => {
         mainWindow = null
     });
@@ -81,9 +112,11 @@ function prepareHandlers() {
         EInvokeEventName['gswitcher:get-process-list'],
         async () => {
             const list: { name: string, owner: string }[] = await snapshot('name', 'owner');
-            return list
-                .filter(item => item.name.includes('.exe') && !!item.owner)
-                .map(item => item.name);
+            return [...new Set(
+                list
+                    .filter(item => item.name.includes('.exe') && !!item.owner)
+                    .map(item => item.name)
+            )];
         }
     );
     ipcMain.handle(

@@ -12,6 +12,7 @@ import { GSwitcherStorage } from './gswitcher-storage';
 export class GSwitcherEventHandler {
 
     private intervalSubsctiption: Subscription;
+    private configChangeSubscription: Subscription;
     private activeOwnerFileName: string = null;
 
     /**
@@ -28,6 +29,7 @@ export class GSwitcherEventHandler {
 
     public init() {
         this.intervalSubsctiption?.unsubscribe();
+        this.configChangeSubscription?.unsubscribe();
         this.intervalSubsctiption = interval(this.checkInterval)
             .subscribe(() => {
                 activeWin().then(res => {
@@ -44,7 +46,6 @@ export class GSwitcherEventHandler {
                         return;
                     }
 
-                    console.log('changing for ', ownerFileName)
                     this.activeOwnerFileName = ownerFileName;
                     const appConfig = config.applications[this.activeOwnerFileName];
 
@@ -64,10 +65,15 @@ export class GSwitcherEventHandler {
                     });
                 })
             });
+        // Reset last target on config update to apply possible changes
+        this.configChangeSubscription = this.gswitcherStorage.observeConfig().subscribe(() => {
+            this.activeOwnerFileName = null;
+        });
     }
 
     public stop() {
         this.intervalSubsctiption?.unsubscribe();
+        this.configChangeSubscription?.unsubscribe();
     }
 }
 

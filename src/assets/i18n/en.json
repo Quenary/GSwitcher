@@ -11,6 +11,7 @@
             "BRIGHTNESS": "Brightness",
             "CONTRAST": "Contrast",
             "GAMMA": "Gamma"
-        }
+        },
+        "SAVE_MESSAGE": "Settings saved"
     }
 }

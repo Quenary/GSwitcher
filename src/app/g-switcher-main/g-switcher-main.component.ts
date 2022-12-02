@@ -1,11 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, debounceTime, from, map, Observable, of, startWith, Subject, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, debounceTime, forkJoin, from, map, Observable, of, skip, startWith, Subject, takeUntil, tap } from 'rxjs';
 import { isElectron } from '../decorators/electron.decorator';
 import type { IGSwitcherConfig, IGSwitcherConfigApplication } from 'src/electron/gswitcher-storage';
 import { EInvokeEventName } from 'src/electron/electron-enums';
 import * as lodashMerge from 'lodash.merge';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
 
 const defaultAppConfig: IGSwitcherConfigApplication = {
   brightness: 0.5,
@@ -22,7 +24,6 @@ const configSaveInterval: number = 2000;
 })
 export class GSwitcherMainComponent
   implements OnInit, OnDestroy {
-
 
   /**
    * Indicates delay before auto save config
@@ -60,10 +61,6 @@ export class GSwitcherMainComponent
     gamma: new FormControl(null, [Validators.required])
   });
   /**
-   * Destroy observable to manage subscriptions
-   */
-  private readonly destroy$ = new Subject<void>();
-  /**
    * Control of search input of process list
    */
   public readonly searchApplicationControl = new FormControl(null);
@@ -81,12 +78,44 @@ export class GSwitcherMainComponent
         return this.processList?.filter(item => item.toLocaleLowerCase().includes(lowerValue));
       })
     );
+  public readonly isLoading$ = new BehaviorSubject<boolean>(false);
+  /**
+   * Destroy observable to manage subscriptions
+   */
+  private readonly destroy$ = new Subject<void>();
 
-
-
-  constructor() { }
+  constructor(
+    private matSnackBar: MatSnackBar,
+    private translateService: TranslateService
+  ) { }
 
   ngOnInit(): void {
+    this.isLoading$.next(true);
+    forkJoin([
+      this.getDisplaysList(),
+      this.getProcessList(),
+      this.getConfig()
+    ]).subscribe(([displays, processes, config]) => {
+      console.log(displays, processes, config)
+      this.displaysList = displays;
+      this.processList = processes;
+      this.config$.next(config);
+      this.searchApplicationControl.setValue(null);
+      this.displaysControl.setValue(
+        !!config?.displays?.length
+          ? config.displays
+          : []
+      );
+      this.initChangesManagement();
+      this.isLoading$.next(false);
+    });
+  }
+
+  /**
+   * Init subscriptions on form / controls
+   * values changes for processing and saving.
+   */
+  private initChangesManagement() {
     // Patching initial default values
     this.form.patchValue(defaultAppConfig);
     // Subscribe to changes of selected app
@@ -151,20 +180,11 @@ export class GSwitcherMainComponent
           displays: this.displaysControl.value
         });
       });
-    this.getDisplaysList()?.subscribe(res => {
-      this.displaysList = res;
-      this.displaysControl.setValue([res?.[0]]);
-    });
-    this.getProcessList()?.subscribe(res => {
-      this.processList = res;
-    });
-    this.getConfig()?.subscribe(res => {
-      this.config$.next(res);
-    });
-
+    // save config subscription
     let interval: any;
     this.config$
       .pipe(
+        skip(1),
         tap(() => {
           clearInterval(interval);
           this.saveProgressBarValue$.next(0);
@@ -182,7 +202,14 @@ export class GSwitcherMainComponent
         debounceTime(configSaveInterval),
         takeUntil(this.destroy$)
       )
-      .subscribe(config => this.setConfig(config));
+      .subscribe(config => {
+        this.setConfig(config);
+        this.matSnackBar.open(
+          this.translateService.instant('MAIN.SAVE_MESSAGE'),
+          null,
+          { duration: 1000 }
+        );
+      });
   }
 
   /**

@@ -19,12 +19,20 @@
     src: local("Material Icons"), local("MaterialIcons-Regular"),
         url("assets/fonts//icons/MaterialIcons-Regular.ttf") format("truetype");
 }
+@font-face {
+    font-family: "Gulag";
+    src: local("Gulag"), url("./assets/fonts/GULAG Pavljenko.otf");
+}
 
-div,
-span {
+* {
     font-family: "Lato", "Arial";
     font-style: normal;
     font-weight: 400;
+}
+
+div,
+span,
+body {
     box-sizing: border-box;
 }
 

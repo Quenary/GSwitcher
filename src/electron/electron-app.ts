@@ -36,8 +36,8 @@ const windowMenu: Array<MenuItemConstructorOptions | MenuItem> = [
         ]
     }
 ];
-const menu = Menu.buildFromTemplate(windowMenu)
-Menu.setApplicationMenu(menu)
+const menu = Menu.buildFromTemplate(windowMenu);
+Menu.setApplicationMenu(menu);
 
 let mainWindow: BrowserWindow | null;
 const gswitcherStorage = new GSwitcherStorage();
@@ -53,6 +53,8 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 960,
         height: 720,
+        autoHideMenuBar: true,
+        icon: path.join(__dirname, './assets/icon/favicon.ico'),
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, './electron-preload.js')

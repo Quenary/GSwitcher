@@ -31,7 +31,7 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: space-between;
 
         .gswitcher-main-header-title {
             font-weight: 700;
@@ -74,6 +74,7 @@
             flex: 1;
             height: 100%;
             gap: 20px;
+            padding-right: 30px;
         }
 
         .gswitcher-main-body-item {
@@ -95,12 +96,6 @@
                 gap: 10px;
                 .search-processes {
                     flex: 1;
-                }
-            }
-            &.slider {
-                width: 90%;
-                ::ng-deep .mdc-slider__track {
-                    box-sizing: content-box;
                 }
             }
         }

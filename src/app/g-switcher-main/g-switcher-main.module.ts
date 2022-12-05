@@ -8,7 +8,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +15,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 
 @NgModule({
   declarations: [
@@ -31,14 +31,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatSelectModule,
     TranslateModule,
     MatProgressSpinnerModule,
-    MatMenuModule,
     MatChipsModule,
     MatDividerModule,
     MatIconModule,
     MatProgressBarModule,
     MatAutocompleteModule,
     MatInputModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatSlideToggleModule
   ]
 })
 export class GSwitcherMainModule { }

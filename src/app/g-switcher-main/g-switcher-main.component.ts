@@ -8,6 +8,7 @@ import * as lodashMerge from 'lodash.merge';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 const defaultAppConfig: IGSwitcherConfigApplication = {
   brightness: 0.5,
@@ -81,6 +82,10 @@ export class GSwitcherMainComponent
       })
     );
   /**
+   * Auto launch enabled flag
+   */
+  public readonly autoLaunchControl = new FormControl(null);
+  /**
    * Loading flag
    */
   public readonly isLoading$ = new BehaviorSubject<boolean>(false);
@@ -102,8 +107,10 @@ export class GSwitcherMainComponent
     this.isLoading$.next(true);
     forkJoin([
       this.getDisplaysList(),
-      this.getConfig()
-    ]).subscribe(([displays, config]) => {
+      this.getConfig(),
+      this.getAutoLaunch()
+    ]).subscribe(([displays, config, autoLaunch]) => {
+      this.autoLaunchControl.setValue(autoLaunch);
       this.displaysList = displays;
       this.config$.next(config);
       this.searchApplicationControl.setValue(null);
@@ -256,6 +263,16 @@ export class GSwitcherMainComponent
     return from(window.electron.invoke(EInvokeEventName['gswitcher:get-config']));
   }
 
+  @isElectron(() => of(false))
+  private getAutoLaunch(): Observable<boolean> {
+    return from(window.electron.invoke(EInvokeEventName['gswitcher:get-auto-launch']));
+  }
+
+  @isElectron(() => of(null))
+  private setAutoLaunch(flag: boolean) {
+    return from(window.electron.invoke(EInvokeEventName['gswitcher:set-auto-launch'], flag));
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -304,5 +321,11 @@ export class GSwitcherMainComponent
   public onClosedAutocomplete() {
     this.processesList$.next(null);
     this.isLoadingProcesses$.next(false);
+  }
+
+  public onChangeAutoLaunch(e: MatSlideToggleChange) {
+    this.setAutoLaunch(e.checked).subscribe({
+      error: () => this.autoLaunchControl.setValue(!e.checked)
+    });
   }
 }

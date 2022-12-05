@@ -8,19 +8,19 @@ export enum EInvokeEventName {
      */
     'gswitcher:get-process-list' = 'gswitcher:get-process-list',
     /**
-     * Set application dedicated config of b/c/g
-     */
-    'gswitcher:set-application-config' = 'gswitcher:set-application-config',
-    /**
-     * Set list of displays to apply settings
-     */
-    'gswitcher:set-displays' = 'gswitcher:set-displays',
-    /**
      * Get current configuration
      */
     'gswitcher:get-config' = 'gswitcher:get-config',
     /**
      * Set configuration
      */
-    'gswitcher:set-config' = 'gswitcher:set-config'
+    'gswitcher:set-config' = 'gswitcher:set-config',
+    /**
+     * Get state of auto launch
+     */
+    'gswitcher:get-auto-launch' = 'gswitcher:get-auto-launch',
+    /**
+     * Set state of auto launch
+     */
+    'gswitcher:set-auto-launch' = 'gswitcher:set-auto-launch'
 }

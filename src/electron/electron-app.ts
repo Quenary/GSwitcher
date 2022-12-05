@@ -16,7 +16,12 @@ import { GSwitcherStorage, IGSwitcherConfig } from './gswitcher-storage';
 import { GSwitcherEventHandler } from './gswitcher-event-handler';
 import { EInvokeEventName } from './electron-enums';
 const { snapshot } = require('process-list');
+const AutoLaunch = require('easy-auto-launch');
 
+const autoLaunch = new AutoLaunch({
+    name: app.getName(),
+    path: app.getPath('exe')
+});
 const windowMenu: Array<MenuItemConstructorOptions | MenuItem> = [
     {
         label: 'File',
@@ -67,7 +72,7 @@ function createWindow() {
             slashes: true
         })
     );
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
     mainWindow.on('closed', () => {
         mainWindow = null
     });
@@ -75,34 +80,6 @@ function createWindow() {
 }
 
 function prepareHandlers() {
-    ipcMain.handle(
-        EInvokeEventName['gswitcher:set-displays'],
-        (
-            event: IpcMainInvokeEvent,
-            displays: string[]
-        ) => {
-            gswitcherStorage.setKeyValue('displays', displays);
-        }
-    )
-    ipcMain.handle(
-        EInvokeEventName['gswitcher:set-application-config'],
-        (
-            event: IpcMainInvokeEvent,
-            appName: string,
-            brightness: number,
-            contrast: number,
-            gamma: number
-        ) => {
-            gswitcherStorage.setApplicationData(
-                appName,
-                {
-                    brightness,
-                    contrast,
-                    gamma
-                }
-            );
-        }
-    )
     ipcMain.handle(
         EInvokeEventName['gswitcher:get-displays-list'],
         async () => {
@@ -124,14 +101,27 @@ function prepareHandlers() {
     ipcMain.handle(
         EInvokeEventName['gswitcher:get-config'],
         () => gswitcherStorage.getConfig()
-    )
+    );
     ipcMain.handle(
         EInvokeEventName['gswitcher:set-config'],
         (
             event: IpcMainInvokeEvent,
             config: IGSwitcherConfig
         ) => gswitcherStorage.setConfig(config)
-    )
+    );
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:get-auto-launch'],
+        () => autoLaunch.isEnabled()
+    );
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:set-auto-launch'],
+        (
+            event: IpcMainInvokeEvent,
+            flag: boolean
+        ) => !!flag
+                ? autoLaunch.enable()
+                : autoLaunch.disable()
+    );
 }
 
 app.on('ready', createWindow);

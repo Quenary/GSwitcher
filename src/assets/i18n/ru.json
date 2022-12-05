@@ -5,6 +5,7 @@
     "MAIN": {
         "TITLE": "GSwitcher",
         "FIELDS": {
+            "AUTO_LAUNCH": "Автозапуск с Windows",
             "DISPLAYS": "Мониторы",
             "PROCESS": {
                 "ADD": "Добавить приложение",

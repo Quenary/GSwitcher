@@ -13,8 +13,7 @@
     "serve:electron": "npm run build && electron .",
     "build": "ng build --base-href ./ && tsc -b tsconfig.electron.json",
     "forge:make": "npm run build && electron-forge make",
-    "forge:start": "electron-forge start",
-    "forge:package": "electron-forge package",
+    "forge:package": "npm run build && electron-forge package",
     "postinstall": "npx electron-rebuild"
   },
   "browser": {
@@ -27,6 +26,7 @@
   "private": true,
   "dependencies": {
     "active-win": "^7.7.2",
+    "easy-auto-launch": "^6.0.2",
     "ffi-napi": "^4.0.3",
     "process-list": "^2.0.0",
     "ref-array-napi": "^1.2.2",
@@ -47,9 +47,9 @@
     "@angular/router": "^15.0.0",
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
+    "lodash.merge": "^4.6.2",
     "tslib": "^2.3.0",
-    "zone.js": "~0.12.0",
-    "lodash.merge": "^4.6.2"
+    "zone.js": "~0.12.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.0.0",

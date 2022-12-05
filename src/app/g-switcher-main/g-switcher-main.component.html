@@ -9,6 +9,12 @@
         <div class="gswitcher-main-header-title">
             {{'MAIN.TITLE' | translate}}
         </div>
+        <div class="gswitcher-main-header-toggle">
+            <mat-slide-toggle [formControl]="autoLaunchControl"
+                              (change)="onChangeAutoLaunch($event)">
+                {{'MAIN.FIELDS.AUTO_LAUNCH' | translate}}
+            </mat-slide-toggle>
+        </div>
     </div>
     <div class="gswitcher-main-body">
         <div class="gswitcher-main-body-left">
@@ -91,7 +97,7 @@
                 <div class="gswitcher-main-body-item-label slider">
                     {{'MAIN.FIELDS.BRIGHTNESS' | translate}}
                 </div>
-                <mat-slider class="gswitcher-main-body-item-field slider"
+                <mat-slider class="gswitcher-main-body-item-field"
                             color="primary"
                             min="0"
                             max="1"
@@ -107,7 +113,7 @@
                 <div class="gswitcher-main-body-item-label slider">
                     {{'MAIN.FIELDS.CONTRAST' | translate}}
                 </div>
-                <mat-slider class="gswitcher-main-body-item-field slider"
+                <mat-slider class="gswitcher-main-body-item-field"
                             color="primary"
                             min="0"
                             max="1"
@@ -123,7 +129,7 @@
                 <div class="gswitcher-main-body-item-label slider">
                     {{'MAIN.FIELDS.GAMMA' | translate}}
                 </div>
-                <mat-slider class="gswitcher-main-body-item-field slider"
+                <mat-slider class="gswitcher-main-body-item-field"
                             color="primary"
                             min="0.4"
                             max="2.8"

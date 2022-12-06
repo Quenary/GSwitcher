@@ -38,6 +38,12 @@
             font-style: bold;
             font-size: 40px;
         }
+        .gswitcher-main-header-toggle {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
     }
 
     .gswitcher-main-body {

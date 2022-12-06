@@ -6,6 +6,7 @@
         "TITLE": "GSwitcher",
         "FIELDS": {
             "AUTO_LAUNCH": "Autostart with Windows",
+            "LAUNCH_MINIMIZED": "Launch minimized",
             "DISPLAYS": "Displays",
             "PROCESS": {
                 "ADD": "Add application",

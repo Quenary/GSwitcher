@@ -1,14 +1,25 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, combineLatest, debounceTime, forkJoin, from, map, Observable, of, skip, startWith, Subject, takeUntil, tap } from 'rxjs';
-import { isElectron } from '../decorators/electron.decorator';
+import {
+  BehaviorSubject,
+  combineLatest,
+  debounceTime,
+  forkJoin,
+  from,
+  map,
+  skip,
+  startWith,
+  Subject,
+  takeUntil,
+  tap
+} from 'rxjs';
 import type { IGSwitcherConfig, IGSwitcherConfigApplication } from 'src/electron/gswitcher-storage';
-import { EInvokeEventName } from 'src/electron/electron-enums';
 import * as lodashMerge from 'lodash.merge';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { ElectronService } from '../shared/electron.service';
 
 const defaultAppConfig: IGSwitcherConfigApplication = {
   brightness: 0.5,
@@ -85,6 +96,7 @@ export class GSwitcherMainComponent
    * Auto launch enabled flag
    */
   public readonly autoLaunchControl = new FormControl(null);
+  public readonly launchMinimizedControl = new FormControl(null);
   /**
    * Loading flag
    */
@@ -100,17 +112,19 @@ export class GSwitcherMainComponent
 
   constructor(
     private matSnackBar: MatSnackBar,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private electronService: ElectronService
   ) { }
 
   ngOnInit(): void {
     this.isLoading$.next(true);
     forkJoin([
-      this.getDisplaysList(),
-      this.getConfig(),
-      this.getAutoLaunch()
+      this.electronService.getDisplaysList(),
+      this.electronService.getConfig(),
+      this.electronService.getAutoLaunch()
     ]).subscribe(([displays, config, autoLaunch]) => {
       this.autoLaunchControl.setValue(autoLaunch);
+      this.launchMinimizedControl.setValue(config.launchMinimized)
       this.displaysList = displays;
       this.config$.next(config);
       this.searchApplicationControl.setValue(null);
@@ -216,61 +230,20 @@ export class GSwitcherMainComponent
         takeUntil(this.destroy$)
       )
       .subscribe(config => {
-        this.setConfig(config);
-        this.matSnackBar.open(
-          this.translateService.instant('MAIN.SAVE_MESSAGE'),
-          null,
-          { duration: 1000 }
-        );
+        this.electronService.setConfig(config);
+        this.showSaveSnack();
       });
   }
 
   /**
-   * Set application config
-   * @param config 
+   * Show config save snack
    */
-  @isElectron()
-  private setConfig(config: IGSwitcherConfig) {
-    window.electron.invoke(
-      EInvokeEventName['gswitcher:set-config'],
-      config
+  private showSaveSnack() {
+    this.matSnackBar.open(
+      this.translateService.instant('MAIN.SAVE_MESSAGE'),
+      null,
+      { duration: 1000 }
     );
-  }
-
-  /**
-   * Get list of active processes
-   */
-  @isElectron(() => of([
-    'code.exe', 'some.exe', 'other.exe', 'sys.exe', 'user.exe', 'blablablablabla.exe'
-  ]))
-  private getProcessList(): Observable<string[]> {
-    return from(window.electron.invoke(EInvokeEventName['gswitcher:get-process-list']));
-  }
-
-  /**
-   * Get list of connected displays
-   */
-  @isElectron(() => of(['DISPLAY_1', 'DISPLAY_2']))
-  private getDisplaysList(): Observable<string[]> {
-    return from(window.electron.invoke(EInvokeEventName['gswitcher:get-displays-list']));
-  }
-
-  /**
-   * Get config from config file
-   */
-  @isElectron(() => of<IGSwitcherConfig>({ displays: [], applications: {} }))
-  private getConfig(): Observable<IGSwitcherConfig> {
-    return from(window.electron.invoke(EInvokeEventName['gswitcher:get-config']));
-  }
-
-  @isElectron(() => of(false))
-  private getAutoLaunch(): Observable<boolean> {
-    return from(window.electron.invoke(EInvokeEventName['gswitcher:get-auto-launch']));
-  }
-
-  @isElectron(() => of(null))
-  private setAutoLaunch(flag: boolean) {
-    return from(window.electron.invoke(EInvokeEventName['gswitcher:set-auto-launch'], flag));
   }
 
   ngOnDestroy(): void {
@@ -287,6 +260,9 @@ export class GSwitcherMainComponent
     this.changeValue(fileName, 'appName');
   }
 
+  /**
+   * Set application from processes autocomplete list
+   */
   public setApplicationFromList(e: MatAutocompleteSelectedEvent) {
     this.searchApplicationControl.setValue(null);
     this.changeValue(e.option.value, 'appName');
@@ -301,6 +277,10 @@ export class GSwitcherMainComponent
     this.form.controls[field].setValue(value);
   }
 
+  /**
+   * On remove applcation callback
+   * @param appName name of app
+   */
   public removeApplication(appName: string) {
     const config = this.config$.getValue();
     delete config.applications[appName];
@@ -308,24 +288,45 @@ export class GSwitcherMainComponent
     this.changeValue(null, 'appName');
   }
 
+  /**
+   * Processes list input click.
+   * Get async processes list with loading.
+   */
   public onClickProcessesInput() {
     this.processesList$.next(null);
     this.isLoadingProcesses$.next(true);
-    from(this.getProcessList())
+    from(this.electronService.getProcessList())
       .subscribe(res => {
         this.processesList$.next(res);
         this.isLoadingProcesses$.next(false);
       });
   }
 
+  /**
+   * Processes autocomplete list close callback.
+   * Clean up processes list and loading.
+   */
   public onClosedAutocomplete() {
     this.processesList$.next(null);
     this.isLoadingProcesses$.next(false);
   }
 
+  /**
+   * Auto launch with windows toggle callback
+   */
   public onChangeAutoLaunch(e: MatSlideToggleChange) {
-    this.setAutoLaunch(e.checked).subscribe({
+    this.electronService.setAutoLaunch(e.checked).subscribe({
+      next: () => this.showSaveSnack(),
       error: () => this.autoLaunchControl.setValue(!e.checked)
     });
+  }
+
+  /**
+   * Launch minimized toggle callback
+   */
+  public onChangeLaunchMinimized(e: MatSlideToggleChange) {
+    const config = this.config$.getValue();
+    config.launchMinimized = e.checked;
+    this.config$.next(config);
   }
 }

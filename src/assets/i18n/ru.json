@@ -6,6 +6,7 @@
         "TITLE": "GSwitcher",
         "FIELDS": {
             "AUTO_LAUNCH": "Автозапуск с Windows",
+            "LAUNCH_MINIMIZED": "Запускать свернутым",
             "DISPLAYS": "Мониторы",
             "PROCESS": {
                 "ADD": "Добавить приложение",

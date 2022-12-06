@@ -2,13 +2,17 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { BehaviorSubject, debounceTime, Observable, skip } from 'rxjs';
 
+/**
+ * GSwitcher config interface
+ */
 export interface IGSwitcherConfig {
+    launchMinimized: boolean;
     /**
-     * Наименование дисплеев, к которым применяются настройки
+     * Names of display devices for which the settings apply.
      */
     displays: string[];
     /**
-     * Конфиги приложений
+     * Applications configs
      */
     applications: {
         [key: string]: IGSwitcherConfigApplication;
@@ -16,7 +20,7 @@ export interface IGSwitcherConfig {
 }
 
 /**
- * Конфиг приложения
+ * Application config
  */
 export interface IGSwitcherConfigApplication {
     brightness: number;
@@ -25,12 +29,13 @@ export interface IGSwitcherConfigApplication {
 }
 
 /**
- * Класс хранилища
+ * Storage class
  */
 export class GSwitcherStorage {
 
     private readonly settingsPath = path.join(__dirname, './settings.json');
     private readonly defaultConfig: IGSwitcherConfig = {
+        launchMinimized: false,
         displays: [],
         applications: {}
     };

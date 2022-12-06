@@ -6,7 +6,9 @@ import {
     shell,
     Menu,
     MenuItemConstructorOptions,
-    MenuItem
+    MenuItem,
+    Tray,
+    Notification
 } from 'electron';
 import * as url from 'url';
 import * as path from 'path';
@@ -18,33 +20,17 @@ import { EInvokeEventName } from './electron-enums';
 const { snapshot } = require('process-list');
 const AutoLaunch = require('easy-auto-launch');
 
-const autoLaunch = new AutoLaunch({
-    name: app.getName(),
-    path: app.getPath('exe')
-});
-const windowMenu: Array<MenuItemConstructorOptions | MenuItem> = [
-    {
-        label: 'File',
-        submenu: [
-            process.platform === 'darwin' ? { role: 'close' } : { role: 'quit' }
-        ]
-    },
-    {
-        role: 'help',
-        submenu: [
-            {
-                label: 'Learn More',
-                click: async () => {
-                    await shell.openExternal('https://github.com/Quenary/GSwitcher')
-                }
-            }
-        ]
-    }
-];
-const menu = Menu.buildFromTemplate(windowMenu);
-Menu.setApplicationMenu(menu);
+const iconPath: string = path.join(__dirname, './assets/icon/favicon.ico');
+const appName: string = 'GSwitcher';
 
-let mainWindow: BrowserWindow | null;
+/**
+ * Fix notification title 'electron.app.appname'
+ * https://stackoverflow.com/questions/65859634/notification-from-electron-shows-electron-app-electron
+ */
+if (process.platform === 'win32') {
+    app.setAppUserModelId(appName);
+}
+
 const gswitcherStorage = new GSwitcherStorage();
 const gswitcherGDI32Wrapper = new GSwitcherGDI32Wrapper();
 const gswitcherEventHandler = new GSwitcherEventHandler(
@@ -53,13 +39,27 @@ const gswitcherEventHandler = new GSwitcherEventHandler(
     1000
 );
 gswitcherEventHandler.init();
+const autoLaunch = new AutoLaunch({
+    name: app.getName(),
+    path: app.getPath('exe')
+});
+
+/**
+ * Quit flag. Becomes truthy on menu button 'quit' click.
+ * 
+ */
+let mainWindowQuit: boolean = false;
+let mainWindow: BrowserWindow | null;
 
 function createWindow() {
+    const launchMinimized = gswitcherStorage.getConfig().launchMinimized;
     mainWindow = new BrowserWindow({
         width: 960,
         height: 720,
         autoHideMenuBar: true,
-        icon: path.join(__dirname, './assets/icon/favicon.ico'),
+        icon: iconPath,
+        show: !launchMinimized,
+        title: `${appName} ${app.getVersion()}`,
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, './electron-preload.js')
@@ -72,13 +72,39 @@ function createWindow() {
             slashes: true
         })
     );
-    // mainWindow.webContents.openDevTools();
     mainWindow.on('closed', () => {
         mainWindow = null
+    });
+    mainWindow.on('close', event => {
+        if (!mainWindowQuit) {
+            // Prevent closing window on close button
+            // minimize instead.
+            event.preventDefault();
+            mainWindow.hide();
+        }
+    });
+    /**
+     * Show notification on app minimize to tray
+     */
+    mainWindow.on('hide', () => {
+        showBackgroundNotification();
     });
     prepareHandlers();
 }
 
+/**
+ * Shows notification about app in background
+ */
+function showBackgroundNotification() {
+    new Notification({
+        title: `${appName} running in the background.`,
+        icon: iconPath,
+    }).show();
+}
+
+/**
+ * Prepare handlers for renderer invoke events
+ */
 function prepareHandlers() {
     ipcMain.handle(
         EInvokeEventName['gswitcher:get-displays-list'],
@@ -124,7 +150,10 @@ function prepareHandlers() {
     );
 }
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+    prepareMenus();
+    createWindow();
+});
 app.on('window-all-closed', function () {
     gswitcherEventHandler.stop();
     const rampValues = gswitcherGDI32Wrapper.calculateRampValues();
@@ -142,3 +171,66 @@ app.on('activate', function () {
     }
 });
 
+
+/**
+ * Tray object reference to prevent garbage collection
+ */
+let tray: Tray = null;
+/**
+ * Prepare app menu and tray menu
+ */
+function prepareMenus() {
+    const quitButton: MenuItemConstructorOptions = {
+        label: 'Quit',
+        click: () => {
+            mainWindowQuit = true;
+            mainWindow?.close();
+        }
+    };
+    const learnMoreButton: MenuItemConstructorOptions = {
+        label: 'Learn More',
+        click: async () => {
+            await shell.openExternal('https://github.com/Quenary/GSwitcher')
+        }
+    };
+    const windowMenuTemplate: Array<MenuItemConstructorOptions | MenuItem> = [
+        {
+            label: 'File',
+            submenu: [
+                {
+                    label: 'Minimize',
+                    click: () => mainWindow?.hide()
+                },
+                quitButton
+            ]
+        },
+        {
+            label: 'Help',
+            submenu: [
+                learnMoreButton
+            ]
+        }
+    ];
+    const windowMenu = Menu.buildFromTemplate(windowMenuTemplate);
+    Menu.setApplicationMenu(windowMenu);
+    const trayMenuTemplate: Array<MenuItemConstructorOptions | MenuItem> = [
+        {
+            label: `${appName} ${app.getVersion()}`,
+            enabled: false,
+        },
+        { type: 'separator' },
+        {
+            label: 'Show App',
+            click: () => mainWindow?.show()
+        },
+        learnMoreButton,
+        quitButton
+    ];
+    const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+    tray = new Tray(iconPath);
+    tray.setContextMenu(trayMenu);
+    tray.setToolTip('GSwitcher');
+    tray.on('double-click', () => {
+        mainWindow?.show();
+    });
+}

@@ -12,8 +12,8 @@
     "serve": "ng serve --open",
     "serve:electron": "npm run build && electron .",
     "build": "ng build --base-href ./ && tsc -b tsconfig.electron.json",
-    "forge:make": "npm run build && electron-forge make",
-    "forge:package": "npm run build && electron-forge package",
+    "forge:make": "npm run build && electron-forge make && start out",
+    "forge:package": "npm run build && electron-forge package && start out",
     "postinstall": "npx electron-rebuild"
   },
   "browser": {

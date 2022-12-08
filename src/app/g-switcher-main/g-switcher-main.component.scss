@@ -104,6 +104,57 @@
                     flex: 1;
                 }
             }
+            &.slider {
+                &:before,
+                &:after {
+                    position: absolute;
+                    top: 60%;
+                    font-size: 17px;
+                    opacity: 0.5;
+                }
+                &:before {
+                    content: attr(min);
+                }
+                &:after {
+                    content: attr(max);
+                    left: 100%;
+                    transform: translateX(-100%);
+                }
+
+                $tickMarksSelector: "::ng-deep .mdc-slider__tick-marks .ng-star-inserted";
+
+                @mixin defaultValueTickStyles {
+                    display: block;
+                    &:before {
+                        position: absolute;
+                        content: $defaultValue;
+                        font-size: 17px;
+                        opacity: 0.5;
+                        top: 5px;
+                        transform: translateX(-50%);
+                    }
+                }
+
+                $defaultValue: "0.5";
+
+                #{$tickMarksSelector} {
+                    display: none;
+                    opacity: 1;
+                    &:nth-child(51) {
+                        @include defaultValueTickStyles();
+                    }
+                }
+
+                &.gamma {
+                    $defaultValue: "1";
+                    #{$tickMarksSelector} {
+                        display: none;
+                        &:nth-child(61) {
+                            @include defaultValueTickStyles();
+                        }
+                    }
+                }
+            }
         }
         .gswitcher-main-body-item-label {
             &.left {

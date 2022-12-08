@@ -8,3 +8,6 @@
 * Bundle main app scripts with Rollup or something (reduce package size, remove node_modules from resources)
 * Write tests
 * Replace timer window change detection to Windows events via ffi?
+* Close main window in background instead of hiding
+* Live preview option
+* Fix extra config save on app change

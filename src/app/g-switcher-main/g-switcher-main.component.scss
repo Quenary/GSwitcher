@@ -25,6 +25,16 @@
         z-index: 999;
     }
 
+    .gswitcher-main-window-header {
+        height: 40px;
+        width: 100%;
+        -webkit-app-region: drag;
+        background-color: white;
+        @media (prefers-color-scheme: dark) {
+            background-color: black;
+        }
+    }
+
     .gswitcher-main-header {
         padding: 20px;
         width: 100%;

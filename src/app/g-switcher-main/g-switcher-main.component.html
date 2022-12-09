@@ -4,6 +4,7 @@
         <mat-spinner class="gswitcher-main-loading-spinner">
         </mat-spinner>
     </div>
+    <div class="gswitcher-main-window-header"></div>
 
     <div class="gswitcher-main-header">
         <div class="gswitcher-main-header-title">
@@ -77,7 +78,8 @@
             </div>
 
             <mat-chip-listbox class="gswitcher-main-body-left-applications"
-                              [formControl]="$any(form.controls.appName)">
+                              [value]="form.controls.appName.value"
+                              (change)="setApplication($event.value)">
                 <mat-chip-option *ngFor="let item of applications$ | async"
                                  color="accent"
                                  [selected]="item === form.controls.appName.value"

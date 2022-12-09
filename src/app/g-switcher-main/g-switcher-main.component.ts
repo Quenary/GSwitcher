@@ -14,7 +14,6 @@ import {
   tap
 } from 'rxjs';
 import type { IGSwitcherConfig, IGSwitcherConfigApplication } from 'src/electron/gswitcher-storage';
-import * as lodashMerge from 'lodash.merge';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
@@ -63,10 +62,10 @@ export class GSwitcherMainComponent
    * Main form
    */
   public readonly form: FormGroup = new FormGroup({
-    appName: new FormControl(null, [Validators.required]),
-    brightness: new FormControl(null, [Validators.required]),
-    contrast: new FormControl(null, [Validators.required]),
-    gamma: new FormControl(null, [Validators.required])
+    appName: new FormControl(null, [Validators.required, Validators.pattern(/.exe$/)]),
+    brightness: new FormControl(null, [Validators.required, Validators.min(0), Validators.max(1)]),
+    contrast: new FormControl(null, [Validators.required, Validators.min(0), Validators.max(1)]),
+    gamma: new FormControl(null, [Validators.required, Validators.min(0.4), Validators.max(2.8)])
   });
   /**
    * Control of search input of process list
@@ -145,35 +144,6 @@ export class GSwitcherMainComponent
   private initChangesManagement() {
     // Patching initial default values
     this.form.patchValue(defaultAppConfig);
-    // Subscribe to changes of selected app
-    this.form.controls.appName.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        const appName = this.form.controls.appName.value;
-        if (!appName) {
-          this.form.patchValue(defaultAppConfig);
-          return;
-        };
-        const config = this.config$.getValue();
-        /**
-         * Set default values in config for new application
-         */
-        if (!config?.applications?.[appName]) {
-          const newConfig: Partial<IGSwitcherConfig> = {
-            applications: {
-              [appName]: { ...defaultAppConfig }
-            }
-          };
-          this.config$.next(
-            lodashMerge(
-              config,
-              newConfig
-            )
-          );
-        }
-        // Patching app config to form
-        this.form.patchValue(this.config$.getValue().applications[appName]);
-      });
     // Subscribe to main form changes
     this.form.valueChanges
       .pipe(
@@ -256,8 +226,8 @@ export class GSwitcherMainComponent
    * @param e input event
    */
   public setApplicationFromFile(e: any) {
-    const fileName: string = e?.target?.files?.[0]?.name;
-    this.changeValue(fileName, 'appName');
+    const appName: string = e?.target?.files?.[0]?.name;
+    this.setApplication(appName);
   }
 
   /**
@@ -265,16 +235,19 @@ export class GSwitcherMainComponent
    */
   public setApplicationFromList(e: MatAutocompleteSelectedEvent) {
     this.searchApplicationControl.setValue(null);
-    this.changeValue(e.option.value, 'appName');
+    this.setApplication(e.option.value);
   }
 
   /**
-   * Change main form field value
-   * @param value value
-   * @param field field
+   * Set application and its data to form
+   * @param appName application name
    */
-  public changeValue(value: any, field: string) {
-    this.form.controls[field].setValue(value);
+  public setApplication(appName: string) {
+    const appConfig = this.config$.getValue()?.applications?.[appName];
+    this.form.patchValue({
+      appName,
+      ...(appConfig ?? defaultAppConfig)
+    }, { emitEvent: !appConfig });
   }
 
   /**
@@ -285,7 +258,10 @@ export class GSwitcherMainComponent
     const config = this.config$.getValue();
     delete config.applications[appName];
     this.config$.next(config);
-    this.changeValue(null, 'appName');
+    this.form.patchValue({
+      appName: null,
+      ...defaultAppConfig
+    }, { emitEvent: false });
   }
 
   /**

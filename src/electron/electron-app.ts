@@ -8,7 +8,8 @@ import {
     MenuItemConstructorOptions,
     MenuItem,
     Tray,
-    Notification
+    Notification,
+    nativeTheme
 } from 'electron';
 import * as url from 'url';
 import * as path from 'path';
@@ -49,10 +50,22 @@ const autoLaunch = new AutoLaunch({
  * 
  */
 let mainWindowQuit: boolean = false;
+/**
+ * Main window object.
+ */
 let mainWindow: BrowserWindow | null;
+/**
+ * Tray object reference to prevent garbage collection
+ */
+let tray: Tray = null;
+
+
 
 function createWindow() {
-    const launchMinimized = gswitcherStorage.getConfig().launchMinimized;
+    const launchMinimized: boolean = gswitcherStorage.getConfig().launchMinimized;
+    const isDarkMode: boolean = nativeTheme.shouldUseDarkColors;
+    const darkColor: string = '#000000';
+    const lightColor: string = '#FFFFFF';
     mainWindow = new BrowserWindow({
         width: 960,
         height: 720,
@@ -60,6 +73,12 @@ function createWindow() {
         icon: iconPath,
         show: !launchMinimized,
         title: `${appName} ${app.getVersion()}`,
+        titleBarStyle: 'hidden',
+        titleBarOverlay: {
+            color: isDarkMode ? darkColor : lightColor,
+            symbolColor: isDarkMode ? lightColor : darkColor,
+            height: 40
+        },
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, './electron-preload.js')
@@ -151,7 +170,7 @@ function prepareHandlers() {
 }
 
 app.on('ready', () => {
-    prepareMenus();
+    tray = createTrayIcon();
     createWindow();
 });
 app.on('window-all-closed', function () {
@@ -173,46 +192,9 @@ app.on('activate', function () {
 
 
 /**
- * Tray object reference to prevent garbage collection
+ * Prepare app tray icon
  */
-let tray: Tray = null;
-/**
- * Prepare app menu and tray menu
- */
-function prepareMenus() {
-    const quitButton: MenuItemConstructorOptions = {
-        label: 'Quit',
-        click: () => {
-            mainWindowQuit = true;
-            mainWindow?.close();
-        }
-    };
-    const learnMoreButton: MenuItemConstructorOptions = {
-        label: 'Learn More',
-        click: async () => {
-            await shell.openExternal('https://github.com/Quenary/GSwitcher')
-        }
-    };
-    const windowMenuTemplate: Array<MenuItemConstructorOptions | MenuItem> = [
-        {
-            label: 'File',
-            submenu: [
-                {
-                    label: 'Minimize',
-                    click: () => mainWindow?.hide()
-                },
-                quitButton
-            ]
-        },
-        {
-            label: 'Help',
-            submenu: [
-                learnMoreButton
-            ]
-        }
-    ];
-    const windowMenu = Menu.buildFromTemplate(windowMenuTemplate);
-    Menu.setApplicationMenu(windowMenu);
+function createTrayIcon(): Tray {
     const trayMenuTemplate: Array<MenuItemConstructorOptions | MenuItem> = [
         {
             label: `${appName} ${app.getVersion()}`,
@@ -223,14 +205,26 @@ function prepareMenus() {
             label: 'Show App',
             click: () => mainWindow?.show()
         },
-        learnMoreButton,
-        quitButton
+        {
+            label: 'Learn More',
+            click: async () => {
+                await shell.openExternal('https://github.com/Quenary/GSwitcher')
+            }
+        },
+        {
+            label: 'Quit',
+            click: () => {
+                mainWindowQuit = true;
+                mainWindow?.close();
+            }
+        }
     ];
     const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
-    tray = new Tray(iconPath);
+    const tray = new Tray(iconPath);
     tray.setContextMenu(trayMenu);
     tray.setToolTip('GSwitcher');
     tray.on('double-click', () => {
         mainWindow?.show();
     });
+    return tray;
 }

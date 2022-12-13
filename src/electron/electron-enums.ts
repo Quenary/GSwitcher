@@ -22,5 +22,9 @@ export enum EInvokeEventName {
     /**
      * Set state of auto launch
      */
-    'gswitcher:set-auto-launch' = 'gswitcher:set-auto-launch'
+    'gswitcher:set-auto-launch' = 'gswitcher:set-auto-launch',
+    /**
+     * Get version of application
+     */
+    'gswitcher:get-app-version' = 'gswitcher:get-app-version'
 }

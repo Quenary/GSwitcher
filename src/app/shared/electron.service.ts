@@ -15,6 +15,14 @@ export class ElectronService {
   constructor() { }
 
   /**
+   * Get application version
+   */
+  @isElectron(() => of('0.0.0'))
+  public getAppVersion(): Observable<string> {
+    return from(window.electron.invoke(EInvokeEventName['gswitcher:get-app-version']));
+  }
+
+  /**
    * Get list of active processes
    */
   @isElectron(() => of([

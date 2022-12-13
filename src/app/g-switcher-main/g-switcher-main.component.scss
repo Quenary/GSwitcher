@@ -25,16 +25,6 @@
         z-index: 999;
     }
 
-    .gswitcher-main-window-header {
-        height: 40px;
-        width: 100%;
-        -webkit-app-region: drag;
-        background-color: white;
-        @media (prefers-color-scheme: dark) {
-            background-color: black;
-        }
-    }
-
     .gswitcher-main-header {
         padding: 20px;
         width: 100%;
@@ -45,8 +35,20 @@
 
         .gswitcher-main-header-title {
             font-weight: 700;
-            font-style: bold;
             font-size: 40px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 100%;
+
+            .gswitcher-main-header-title-version {
+                position: absolute;
+                font-size: 14px;
+                top: 0;
+                left: 0;
+                transform: translateX(100%);
+                width: 100%;
+            }
         }
         .gswitcher-main-header-toggle {
             display: flex;
@@ -64,6 +66,8 @@
         gap: 30px;
         flex: 1;
         width: 100%;
+        overflow-y: scroll;
+        overflow-x: hidden;
 
         .gswitcher-main-body-divider {
             height: 100%;

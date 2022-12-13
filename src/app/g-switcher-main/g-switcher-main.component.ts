@@ -37,6 +37,10 @@ export class GSwitcherMainComponent
   implements OnInit, OnDestroy {
 
   /**
+   * Version of application
+   */
+  public readonly appVersion$ = this.electronService.getAppVersion();
+  /**
    * Indicates delay before auto save config
    */
   public readonly saveProgressBarValue$ = new BehaviorSubject<number>(null);

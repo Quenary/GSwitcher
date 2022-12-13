@@ -10,4 +10,4 @@
 * Replace timer window change detection to Windows events via ffi?
 * Close main window in background instead of hiding
 * Live preview option
-* Fix extra config save on app change
+* Configure Github version check

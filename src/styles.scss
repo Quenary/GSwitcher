@@ -1,4 +1,22 @@
-@import "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css";
+@use "../node_modules/@angular/material" as mat;
+@import "../node_modules/@angular/material/_theming";
+@include mat.core();
+
+$angular-primary: mat.define-palette(mat.$cyan-palette);
+$angular-accent: mat.define-palette(mat.$teal-palette);
+$angular-warn: mat.define-palette(mat.$orange-palette);
+$angular-default-theme: mat.define-light-theme($angular-primary, $angular-accent, $angular-warn);
+@include mat.all-component-themes($angular-default-theme);
+
+$angular-dark-theme: mat.define-dark-theme($angular-primary, $angular-accent, $angular-warn);
+
+@media (prefers-color-scheme: dark) {
+    html,
+    body {
+        background-color: black !important;
+    }
+    @include mat.all-component-colors($angular-dark-theme);
+}
 
 @font-face {
     font-family: "Lato";
@@ -19,10 +37,6 @@
     src: local("Material Icons"), local("MaterialIcons-Regular"),
         url("assets/fonts//icons/MaterialIcons-Regular.ttf") format("truetype");
 }
-@font-face {
-    font-family: "Gulag";
-    src: local("Gulag"), url("./assets/fonts/GULAG Pavljenko.otf");
-}
 
 * {
     font-family: "Lato", "Arial";
@@ -36,10 +50,33 @@ body {
     box-sizing: border-box;
 }
 
+* {
+    $color-config: mat.get-color-config($angular-default-theme);
+    $primary-palette: map-get($color-config, "primary");
+    $scroll: mat.get-color-from-palette($primary-palette, 700);
+    $scroll-active: mat.get-color-from-palette($primary-palette, 500);
+
+    &::-webkit-scrollbar {
+        width: 8px !important;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: $scroll !important;
+        border-radius: 4px !important;
+        cursor: pointer !important;
+        &:hover {
+            background: $scroll-active !important;
+        }
+    }
+}
+
+html,
 body {
-    margin: 0;
     height: 100vh;
     width: 100vw;
+    background-color: white;
+}
+body {
+    margin: 0;
     overflow: hidden;
 }
 

@@ -74,6 +74,7 @@ function createWindow() {
         show: !launchMinimized,
         title: `${appName} ${app.getVersion()}`,
         titleBarStyle: 'hidden',
+        backgroundColor: isDarkMode ? darkColor : lightColor,
         titleBarOverlay: {
             color: isDarkMode ? darkColor : lightColor,
             symbolColor: isDarkMode ? lightColor : darkColor,
@@ -166,6 +167,10 @@ function prepareHandlers() {
         ) => !!flag
                 ? autoLaunch.enable()
                 : autoLaunch.disable()
+    );
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:get-app-version'],
+        () => app.getVersion()
     );
 }
 

@@ -6,15 +6,6 @@
     align-items: flex-start;
     justify-content: flex-start;
 
-    .gswitcher-header {
-        height: 45px;
-        width: 100%;
-        -webkit-app-region: drag;
-        background-color: white;
-        @media (prefers-color-scheme: dark) {
-            background-color: black;
-        }
-    }
     :not(.gswitcher-header) {
         flex: 1;
     }

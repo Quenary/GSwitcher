@@ -1,12 +1,25 @@
 {
     "COMMON": {
-        "LOADING": "Загрузка"
+        "LOADING": "Загрузка",
+        "OPEN": "Открыть",
+        "CLOSE": "Закрыть",
+        "CANCEL": "Отмена"
+    },
+    "HEADER": {
+        "LEARN_MORE": "Подробнее о приложении",
+        "CHECK_VERSION": "Проверить наличие обновлений",
+        "QUIT": "Закрыть",
+        "NEW_VERSION_DIALOG": {
+            "HEADER": "Доступна новая версия",
+            "NO_UPDATES": "Обновлений нет"
+        }
     },
     "MAIN": {
         "TITLE": "GSwitcher",
         "FIELDS": {
             "AUTO_LAUNCH": "Автозапуск с Windows",
             "LAUNCH_MINIMIZED": "Запускать свернутым",
+            "CHECK_UPDATES": "Проверять наличие обновлений",
             "DISPLAYS": "Мониторы",
             "PROCESS": {
                 "ADD": "Добавить приложение",

@@ -26,5 +26,24 @@ export enum EInvokeEventName {
     /**
      * Get version of application
      */
-    'gswitcher:get-app-version' = 'gswitcher:get-app-version'
+    'gswitcher:get-app-version' = 'gswitcher:get-app-version',
+    /**
+     * Check version update
+     */
+    'gswitcher:check-version' = 'gswitcher:check-version',
+    /**
+     * Open external link in browser
+     */
+    'gswitcher:open-external-link' = 'gswitcher:open-external-link',
+    /**
+     * Quit app
+     */
+    'gswitcher:quit' = 'gswitcher:quit'
+}
+
+export enum EAppUrls {
+    /**
+     * Repository url
+     */
+    'repo' = 'https://github.com/Quenary/GSwitcher'
 }

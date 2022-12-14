@@ -13,6 +13,11 @@
             </div>
         </div>
         <div class="gswitcher-main-header-toggle">
+            <mat-slide-toggle [formControl]="checkUpdatesControl"
+                              color="warn"
+                              (change)="onChangeCheckUpdates($event)">
+                {{'MAIN.FIELDS.CHECK_UPDATES' | translate}}
+            </mat-slide-toggle>
             <mat-slide-toggle [formControl]="autoLaunchControl"
                               color="warn"
                               (change)="onChangeAutoLaunch($event)">

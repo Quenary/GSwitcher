@@ -6,6 +6,7 @@ import { BehaviorSubject, debounceTime, Observable, skip } from 'rxjs';
  * GSwitcher config interface
  */
 export interface IGSwitcherConfig {
+    checkUpdates: boolean;
     launchMinimized: boolean;
     /**
      * Names of display devices for which the settings apply.
@@ -35,6 +36,7 @@ export class GSwitcherStorage {
 
     private readonly settingsPath = path.join(__dirname, './settings.json');
     private readonly defaultConfig: IGSwitcherConfig = {
+        checkUpdates: true,
         launchMinimized: false,
         displays: [],
         applications: {}

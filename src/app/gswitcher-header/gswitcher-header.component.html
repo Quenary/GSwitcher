@@ -1,0 +1,24 @@
+<div class="GSwitcherHeaderClass">
+    <button mat-button
+            [matMenuTriggerFor]="menu">
+        <mat-icon>menu</mat-icon>
+    </button>
+</div>
+
+<mat-menu #menu="matMenu">
+    <button mat-menu-item
+            (click)="openRepository()">
+        <mat-icon>info_outline</mat-icon>
+        {{'HEADER.LEARN_MORE' | translate}}
+    </button>
+    <button mat-menu-item
+            (click)="checkUpdates()">
+        <mat-icon>refresh</mat-icon>
+        {{'HEADER.CHECK_VERSION' | translate}}
+    </button>
+    <button mat-menu-item
+            (click)="quit()">
+        <mat-icon>logout</mat-icon>
+        {{'HEADER.QUIT' | translate}}
+    </button>
+</mat-menu>

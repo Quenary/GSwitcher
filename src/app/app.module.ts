@@ -7,6 +7,7 @@ import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-transla
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { GSwitcherHeaderModule } from './gswitcher-header/gswitcher-header.module';
 
 
 function TranslateInitializerFactory(translate: TranslateService, injector: Injector) {
@@ -41,7 +42,8 @@ function HttpLoaderFactory(httpClient: HttpClient) {
         useFactory: HttpLoaderFactory,
         deps: [HttpClient]
       }
-    })
+    }),
+    GSwitcherHeaderModule
   ],
   providers: [
     {

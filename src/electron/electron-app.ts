@@ -17,12 +17,33 @@ import { GSwitcherGDI32Wrapper } from './gswitcher-gdi32-wrapper';
 import { graphics } from 'systeminformation'
 import { GSwitcherStorage, IGSwitcherConfig } from './gswitcher-storage';
 import { GSwitcherEventHandler } from './gswitcher-event-handler';
-import { EInvokeEventName } from './electron-enums';
+import { EAppUrls, EInvokeEventName } from './electron-enums';
 const { snapshot } = require('process-list');
 const AutoLaunch = require('easy-auto-launch');
+const versionCheck = require('github-version-checker');
 
 const iconPath: string = path.join(__dirname, './assets/icon/favicon.ico');
 const appName: string = 'GSwitcher';
+
+const versionCheckOptions = {
+    repo: 'electron',// 'GSwitcher',
+    owner: 'electron',//'Quenary',
+    currentVersion: process.versions.electron//app.getVersion()
+};
+// const versionCheckPromise: Promise<any> = versionCheck(versionCheckOptions);
+// .then(res => {
+//     console.log('res',res)
+// })
+// .catch(error => {
+//     console.log('error',error)
+// })
+// const versionCheckRes = {
+//     name: 'electron v23.0.0-alpha.2',
+//     tag: { name: 'v23.0.0-alpha.2' },
+//     isPrerelease: true,
+//     publishedAt: '2022-12-08T21:10:54Z',
+//     url: 'https://github.com/electron/electron/releases/tag/v23.0.0-alpha.2'
+// };
 
 /**
  * Fix notification title 'electron.app.appname'
@@ -172,6 +193,24 @@ function prepareHandlers() {
         EInvokeEventName['gswitcher:get-app-version'],
         () => app.getVersion()
     );
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:check-version'],
+        () => versionCheck(versionCheckOptions)
+    );
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:open-external-link'],
+        (
+            event: IpcMainInvokeEvent,
+            link: string
+        ) => shell.openExternal(link)
+    );
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:quit'],
+        () => {
+            mainWindowQuit = true;
+            app.quit();
+        }
+    );
 }
 
 app.on('ready', () => {
@@ -213,7 +252,7 @@ function createTrayIcon(): Tray {
         {
             label: 'Learn More',
             click: async () => {
-                await shell.openExternal('https://github.com/Quenary/GSwitcher')
+                await shell.openExternal(EAppUrls.repo)
             }
         },
         {

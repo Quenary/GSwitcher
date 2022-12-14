@@ -100,6 +100,7 @@ export class GSwitcherMainComponent
    */
   public readonly autoLaunchControl = new FormControl(null);
   public readonly launchMinimizedControl = new FormControl(null);
+  public readonly checkUpdatesControl = new FormControl(null);
   /**
    * Loading flag
    */
@@ -127,7 +128,8 @@ export class GSwitcherMainComponent
       this.electronService.getAutoLaunch()
     ]).subscribe(([displays, config, autoLaunch]) => {
       this.autoLaunchControl.setValue(autoLaunch);
-      this.launchMinimizedControl.setValue(config.launchMinimized)
+      this.launchMinimizedControl.setValue(config.launchMinimized);
+      this.checkUpdatesControl.setValue(config.checkUpdates);
       this.displaysList = displays;
       this.config$.next(config);
       this.searchApplicationControl.setValue(null);
@@ -307,6 +309,15 @@ export class GSwitcherMainComponent
   public onChangeLaunchMinimized(e: MatSlideToggleChange) {
     const config = this.config$.getValue();
     config.launchMinimized = e.checked;
+    this.config$.next(config);
+  }
+
+  /**
+   * Check updates toggle callback
+   */
+  public onChangeCheckUpdates(e: MatSlideToggleChange) {
+    const config = this.config$.getValue();
+    config.checkUpdates = e.checked;
     this.config$.next(config);
   }
 }

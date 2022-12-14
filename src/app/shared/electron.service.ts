@@ -3,6 +3,7 @@ import { from, Observable, of } from 'rxjs';
 import { EInvokeEventName } from 'src/electron/electron-enums';
 import type { IGSwitcherConfig } from 'src/electron/gswitcher-storage';
 import { isElectron } from '../decorators/electron.decorator';
+import { IVersionCheckResponse } from '../interfaces/version-check';
 
 /**
  * Wrapper to electron main process handlers
@@ -43,7 +44,7 @@ export class ElectronService {
   /**
    * Get config from config file
    */
-  @isElectron(() => of<IGSwitcherConfig>({ launchMinimized: false, displays: [], applications: {} }))
+  @isElectron(() => of<IGSwitcherConfig>({ checkUpdates: true, launchMinimized: false, displays: [], applications: {} }))
   public getConfig(): Observable<IGSwitcherConfig> {
     return from(window.electron.invoke(EInvokeEventName['gswitcher:get-config']));
   }
@@ -74,5 +75,30 @@ export class ElectronService {
   @isElectron(() => of(null))
   public setAutoLaunch(flag: boolean) {
     return from(window.electron.invoke(EInvokeEventName['gswitcher:set-auto-launch'], flag));
+  }
+
+  /**
+   * Check version update
+   */
+  @isElectron(() => of(null))
+  public checkVersion(): Observable<IVersionCheckResponse> {
+    return from(window.electron.invoke(EInvokeEventName['gswitcher:check-version']));
+  }
+
+  /**
+   * Opens external link in browser
+   * @param link link
+   */
+  @isElectron()
+  public openExternalLink(link: string) {
+    window.electron.invoke(EInvokeEventName['gswitcher:open-external-link'], link);
+  }
+
+  /**
+   * Quits app
+   */
+  @isElectron()
+  public quit() {
+    window.electron.invoke(EInvokeEventName['gswitcher:quit']);
   }
 }

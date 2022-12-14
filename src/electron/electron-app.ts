@@ -24,26 +24,11 @@ const versionCheck = require('github-version-checker');
 
 const iconPath: string = path.join(__dirname, './assets/icon/favicon.ico');
 const appName: string = 'GSwitcher';
-
 const versionCheckOptions = {
-    repo: 'electron',// 'GSwitcher',
-    owner: 'electron',//'Quenary',
-    currentVersion: process.versions.electron//app.getVersion()
+    repo: 'GSwitcher',
+    owner: 'Quenary',
+    currentVersion: app.getVersion()
 };
-// const versionCheckPromise: Promise<any> = versionCheck(versionCheckOptions);
-// .then(res => {
-//     console.log('res',res)
-// })
-// .catch(error => {
-//     console.log('error',error)
-// })
-// const versionCheckRes = {
-//     name: 'electron v23.0.0-alpha.2',
-//     tag: { name: 'v23.0.0-alpha.2' },
-//     isPrerelease: true,
-//     publishedAt: '2022-12-08T21:10:54Z',
-//     url: 'https://github.com/electron/electron/releases/tag/v23.0.0-alpha.2'
-// };
 
 /**
  * Fix notification title 'electron.app.appname'

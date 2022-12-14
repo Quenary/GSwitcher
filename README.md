@@ -10,4 +10,3 @@
 * Replace timer window change detection to Windows events via ffi?
 * Close main window in background instead of hiding
 * Live preview option
-* Configure Github version check

@@ -37,7 +37,8 @@
                             class="gswitcher-main-body-item-field">
                 <mat-label>{{'MAIN.FIELDS.DISPLAYS' | translate}}</mat-label>
                 <mat-select [formControl]="displaysControl"
-                            multiple>
+                            multiple
+                            required>
                     <mat-option *ngFor="let item of displaysList"
                                 [value]="item">{{item}}
                     </mat-option>

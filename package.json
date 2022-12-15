@@ -1,6 +1,6 @@
 {
   "name": "gswitcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./dist/gswitcher/electron-app.js",
   "author": {
     "email": "evgeny.savin.ad@gmail.com",
@@ -23,7 +23,7 @@
     "assert": false,
     "util": false
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "active-win": "^7.7.2",
     "easy-auto-launch": "^6.0.2",

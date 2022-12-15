@@ -65,6 +65,23 @@ let mainWindow: BrowserWindow;
 let tray: Tray = null;
 
 /**
+ * Checks for updates if it enabled in config
+ */
+function checkForUpdates() {
+    if (gswitcherStorage.getConfig().checkUpdates) {
+        versionCheck(versionCheckOptions, (err, res) => {
+            const version = res?.tag?.name;
+            if (!!version) {
+                new Notification({
+                    title: `New version ${res.tag.name} available!`,
+                    icon: iconPath
+                }).show();
+            }
+        });
+    }
+}
+
+/**
  * Create main window
  */
 function createWindow() {
@@ -74,7 +91,6 @@ function createWindow() {
         return;
     }
 
-    console.log('creating window')
     const isDarkMode: boolean = nativeTheme.shouldUseDarkColors;
     const darkColor: string = '#000000';
     const lightColor: string = '#FFFFFF';
@@ -192,6 +208,7 @@ function prepareHandlers() {
  * Run some code when app ready
  */
 app.on('ready', () => {
+    checkForUpdates();
     tray = createTrayIcon();
     prepareHandlers();
     if (gswitcherStorage.getConfig().launchMinimized) {

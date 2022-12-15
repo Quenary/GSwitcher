@@ -9,10 +9,14 @@ import { IVersionCheckResponse } from 'src/app/interfaces/version-check';
 })
 export class GSwitcherNewVersionDialogComponent {
 
+  public version: string;
+
   constructor(
     private dialogRef: MatDialogRef<GSwitcherNewVersionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) private data: IVersionCheckResponse
-  ) { }
+  ) {
+    this.version = data.tag.name;
+  }
 
   public apply() {
     this.dialogRef.close(this.data.url);

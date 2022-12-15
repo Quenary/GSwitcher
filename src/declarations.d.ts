@@ -10,6 +10,12 @@ declare global {
                 chrome: () => string,
                 electron: () => string
             },
+            /**
+             * Invoke main process event handlers
+             * @param name Handler name
+             * @param args Arguments
+             * @returns any
+             */
             invoke: <T = any>(name: EInvokeEventName, ...args: any[]) => Promise<T>
         }
     }

@@ -29,7 +29,9 @@ export class GSwitcherHeaderComponent {
       if (!!data) {
         const dialogRef = this.matDialog.open(GSwitcherNewVersionDialogComponent, { data });
         dialogRef.afterClosed().subscribe(link => {
-          this.electronService.openExternalLink(link);
+          if (!!link) {
+            this.electronService.openExternalLink(link);
+          }
         });
       }
       else {

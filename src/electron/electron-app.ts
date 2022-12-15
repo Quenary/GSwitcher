@@ -50,25 +50,31 @@ const autoLaunch = new AutoLaunch({
     name: app.getName(),
     path: app.getPath('exe')
 });
-
 /**
- * Quit flag. Becomes truthy on menu button 'quit' click.
- * 
+ * Variable that indicates wheather the app quiting
+ * for manage background work notification.
  */
-let mainWindowQuit: boolean = false;
+let appQuiting: boolean = false;
 /**
  * Main window object.
  */
-let mainWindow: BrowserWindow | null;
+let mainWindow: BrowserWindow;
 /**
  * Tray object reference to prevent garbage collection
  */
 let tray: Tray = null;
 
-
-
+/**
+ * Create main window
+ */
 function createWindow() {
-    const launchMinimized: boolean = gswitcherStorage.getConfig().launchMinimized;
+    if (!!mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+        return;
+    }
+
+    console.log('creating window')
     const isDarkMode: boolean = nativeTheme.shouldUseDarkColors;
     const darkColor: string = '#000000';
     const lightColor: string = '#FFFFFF';
@@ -77,7 +83,6 @@ function createWindow() {
         height: 720,
         autoHideMenuBar: true,
         icon: iconPath,
-        show: !launchMinimized,
         title: `${appName} ${app.getVersion()}`,
         titleBarStyle: 'hidden',
         backgroundColor: isDarkMode ? darkColor : lightColor,
@@ -99,23 +104,11 @@ function createWindow() {
         })
     );
     mainWindow.on('closed', () => {
-        mainWindow = null
-    });
-    mainWindow.on('close', event => {
-        if (!mainWindowQuit) {
-            // Prevent closing window on close button
-            // minimize instead.
-            event.preventDefault();
-            mainWindow.hide();
+        mainWindow = null;
+        if (!appQuiting) {
+            showBackgroundNotification();
         }
     });
-    /**
-     * Show notification on app minimize to tray
-     */
-    mainWindow.on('hide', () => {
-        showBackgroundNotification();
-    });
-    prepareHandlers();
 }
 
 /**
@@ -191,35 +184,49 @@ function prepareHandlers() {
     );
     ipcMain.handle(
         EInvokeEventName['gswitcher:quit'],
-        () => {
-            mainWindowQuit = true;
-            app.quit();
-        }
+        () => quitApp()
     );
 }
 
+/**
+ * Run some code when app ready
+ */
 app.on('ready', () => {
     tray = createTrayIcon();
-    createWindow();
+    prepareHandlers();
+    if (gswitcherStorage.getConfig().launchMinimized) {
+        showBackgroundNotification();
+    }
+    else {
+        createWindow();
+    }
+
 });
-app.on('window-all-closed', function () {
+/**
+ * Run some code beffore app quit
+ */
+app.on('before-quit', () => {
     gswitcherEventHandler.stop();
     const rampValues = gswitcherGDI32Wrapper.calculateRampValues();
     const ramp = gswitcherGDI32Wrapper.getFlatRamp(rampValues);
     gswitcherStorage.getConfig().displays.forEach(display => {
         gswitcherGDI32Wrapper.setDeviceGammaRamp(display, ramp)
     });
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
 });
-app.on('activate', function () {
-    if (mainWindow === null) {
-        createWindow();
-    }
-});
+/**
+ * Prevent app from closing on all windows closed
+ */
+app.on('window-all-closed', event => {
+    event.preventDefault();
+})
 
-
+/**
+ * Quit the app
+ */
+function quitApp() {
+    appQuiting = true;
+    app.quit();
+}
 /**
  * Prepare app tray icon
  */
@@ -232,7 +239,7 @@ function createTrayIcon(): Tray {
         { type: 'separator' },
         {
             label: 'Show App',
-            click: () => mainWindow?.show()
+            click: () => createWindow()
         },
         {
             label: 'Learn More',
@@ -242,10 +249,7 @@ function createTrayIcon(): Tray {
         },
         {
             label: 'Quit',
-            click: () => {
-                mainWindowQuit = true;
-                mainWindow?.close();
-            }
+            click: () => quitApp()
         }
     ];
     const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
@@ -253,7 +257,7 @@ function createTrayIcon(): Tray {
     tray.setContextMenu(trayMenu);
     tray.setToolTip('GSwitcher');
     tray.on('double-click', () => {
-        mainWindow?.show();
+        createWindow();
     });
     return tray;
 }

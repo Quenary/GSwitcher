@@ -2,7 +2,7 @@
 ## [**Download latest release**](https://github.com/Quenary/GSwitcher/releases/latest)
 ![Alt text](/extras//screenshots/gswitcher-1.0.0-screenshot.png?raw=true "Optional Title")
 
-## Angular / Electron app.
+## Angular / Electron app / Node.js 16.13.2.
 ### App provides controls over PC displays color settings (brightness, contrast, gamma) depending on active window.
 ### App makes only one internet request for checking for updates (there is an option to disable it).
 ---

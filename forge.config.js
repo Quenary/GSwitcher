@@ -6,7 +6,8 @@ module.exports = {
       "^/.vscode",
       "^/build",
       "^/src",
-      "^/out"
+      "^/out",
+      "^/extras"
     ]
   },
   rebuildConfig: {},

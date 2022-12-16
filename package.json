@@ -1,6 +1,6 @@
 {
   "name": "gswitcher",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "./dist/gswitcher/electron-app.js",
   "author": {
     "email": "evgeny.savin.ad@gmail.com",
@@ -11,7 +11,7 @@
   "scripts": {
     "serve": "ng serve --open",
     "serve:electron": "npm run build && electron .",
-    "build": "ng build --base-href ./ && tsc -b tsconfig.electron.json",
+    "build": "ng build --configuration=production --base-href ./ && tsc -b tsconfig.electron.json",
     "forge:make": "npm run build && electron-forge make && start out",
     "forge:package": "npm run build && electron-forge package && start out",
     "postinstall": "npx electron-rebuild"
@@ -36,22 +36,6 @@
     "rxjs": "~7.5.0",
     "systeminformation": "^5.14.4"
   },
-  "peerDependencies": {
-    "@angular/animations": "^15.0.0",
-    "@angular/cdk": "~15.0.0",
-    "@angular/common": "^15.0.0",
-    "@angular/compiler": "^15.0.0",
-    "@angular/core": "^15.0.0",
-    "@angular/forms": "^15.0.0",
-    "@angular/material": "^15.0.0",
-    "@angular/platform-browser": "^15.0.0",
-    "@angular/platform-browser-dynamic": "^15.0.0",
-    "@angular/router": "^15.0.0",
-    "@ngx-translate/core": "^14.0.0",
-    "@ngx-translate/http-loader": "^7.0.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.12.0"
-  },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.0.0",
     "@angular/cli": "~15.0.0",
@@ -75,6 +59,20 @@
     "karma-jasmine-html-reporter": "~2.0.0",
     "supervisor": "^0.12.0",
     "ts-node": "^10.9.1",
-    "typescript": "~4.8.2"
+    "typescript": "~4.8.2",
+    "@angular/animations": "^15.0.0",
+    "@angular/cdk": "~15.0.0",
+    "@angular/common": "^15.0.0",
+    "@angular/compiler": "^15.0.0",
+    "@angular/core": "^15.0.0",
+    "@angular/forms": "^15.0.0",
+    "@angular/material": "^15.0.0",
+    "@angular/platform-browser": "^15.0.0",
+    "@angular/platform-browser-dynamic": "^15.0.0",
+    "@angular/router": "^15.0.0",
+    "@ngx-translate/core": "^14.0.0",
+    "@ngx-translate/http-loader": "^7.0.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.12.0"
   }
 }

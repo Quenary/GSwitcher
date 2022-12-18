@@ -11,7 +11,6 @@ import {
     Notification,
     nativeTheme
 } from 'electron';
-import * as url from 'url';
 import * as path from 'path';
 import { GSwitcherGDI32Wrapper } from './gswitcher-gdi32-wrapper';
 import { graphics } from 'systeminformation'
@@ -21,6 +20,10 @@ import { EAppUrls, EInvokeEventName } from './electron-enums';
 const { snapshot } = require('process-list');
 const AutoLaunch = require('easy-auto-launch');
 const versionCheck = require('github-version-checker');
+
+function isDev() {
+    return !!process.defaultApp;
+}
 
 const iconPath: string = path.join(__dirname, './assets/icon/favicon.ico');
 const appName: string = 'GSwitcher';
@@ -108,17 +111,15 @@ function createWindow() {
             height: 40
         },
         webPreferences: {
-            nodeIntegration: true,
             preload: path.join(__dirname, './electron-preload.js')
         }
     });
     mainWindow.loadURL(
-        url.format({
-            pathname: path.join(__dirname, `./index.html`),
-            protocol: "file:",
-            slashes: true
-        })
+        path.join(__dirname, `./index.html`)
     );
+    if (isDev()) {
+        mainWindow.webContents.openDevTools();
+    }
     mainWindow.on('closed', () => {
         mainWindow = null;
         if (!appQuiting) {
@@ -235,7 +236,7 @@ app.on('before-quit', () => {
  */
 app.on('window-all-closed', event => {
     event.preventDefault();
-})
+});
 
 /**
  * Quit the app

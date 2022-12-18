@@ -10,6 +10,7 @@ import {
   skip,
   startWith,
   Subject,
+  take,
   takeUntil,
   tap
 } from 'rxjs';
@@ -61,7 +62,7 @@ export class GSwitcherMainComponent
   /**
    * Control of displays selection
    */
-  public readonly displaysControl = new FormControl(null);
+  public readonly displaysControl = new FormControl(null, [Validators.required]);
   /**
    * Main form
    */
@@ -150,6 +151,14 @@ export class GSwitcherMainComponent
   private initChangesManagement() {
     // Patching initial default values
     this.form.patchValue(defaultAppConfig);
+    // Mark displays control on first form changes,
+    // let user know that displays is required
+    this.form.valueChanges
+      .pipe(take(1))
+      .subscribe(() => {
+        this.displaysControl.markAsTouched();
+        this.displaysControl.updateValueAndValidity();
+      });
     // Subscribe to main form changes
     this.form.valueChanges
       .pipe(

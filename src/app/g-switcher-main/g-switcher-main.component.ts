@@ -97,11 +97,21 @@ export class GSwitcherMainComponent
       })
     );
   /**
-   * Auto launch enabled flag
+   * Auto launch control
    */
   public readonly autoLaunchControl = new FormControl(null);
+  /**
+   * Launch minimized control
+   */
   public readonly launchMinimizedControl = new FormControl(null);
+  /**
+   * Check for updates control
+   */
   public readonly checkUpdatesControl = new FormControl(null);
+  /**
+   * Live preview active control
+   */
+  public readonly livePreviewControl = new FormControl(false);
   /**
    * Loading flag
    */
@@ -177,6 +187,7 @@ export class GSwitcherMainComponent
           };
           config.applications[appName] = appConfig;
           this.config$.next(config);
+          this.electronService.setLivePreviewValues(appConfig);
         }
       });
     // Subscribe to changes of selected displays
@@ -328,5 +339,12 @@ export class GSwitcherMainComponent
     const config = this.config$.getValue();
     config.checkUpdates = e.checked;
     this.config$.next(config);
+  }
+
+  /**
+   * Live preview toggle callback
+   */
+  public onChangeLivePreview(e: MatSlideToggleChange) {
+    this.electronService.setLivePreviewActive(e.checked);
   }
 }

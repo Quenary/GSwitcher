@@ -14,7 +14,7 @@ import {
 import * as path from 'path';
 import { GSwitcherGDI32Wrapper } from './gswitcher-gdi32-wrapper';
 import { graphics } from 'systeminformation'
-import { GSwitcherStorage, IGSwitcherConfig } from './gswitcher-storage';
+import { GSwitcherStorage, IGSwitcherConfig, IGSwitcherConfigApplication } from './gswitcher-storage';
 import { GSwitcherEventHandler } from './gswitcher-event-handler';
 import { EAppUrls, EInvokeEventName } from './electron-enums';
 const { snapshot } = require('process-list');
@@ -120,8 +120,9 @@ function createWindow() {
     if (isDev()) {
         mainWindow.webContents.openDevTools();
     }
-    mainWindow.on('closed', () => {
+    mainWindow.once('closed', () => {
         mainWindow = null;
+        gswitcherEventHandler.setLivePreviewActive(false);
         if (!appQuiting) {
             showBackgroundNotification();
         }
@@ -157,6 +158,7 @@ function prepareHandlers() {
                 list
                     .filter(item => item.name.includes('.exe') && !!item.owner)
                     .map(item => item.name)
+                    .sort((a, b) => a.localeCompare(b, 'string', { numeric: true }))
             )];
         }
     );
@@ -202,6 +204,20 @@ function prepareHandlers() {
     ipcMain.handle(
         EInvokeEventName['gswitcher:quit'],
         () => quitApp()
+    );
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:set-live-preview-active'],
+        (
+            event: IpcMainInvokeEvent,
+            flag: boolean
+        ) => gswitcherEventHandler.setLivePreviewActive(flag)
+    );
+    ipcMain.handle(
+        EInvokeEventName['gswitcher:set-live-preview-values'],
+        (
+            event: IpcMainInvokeEvent,
+            values: IGSwitcherConfigApplication
+        ) => gswitcherEventHandler.setLivePreviewValues(values)
     );
 }
 

@@ -28,7 +28,8 @@
             },
             "BRIGHTNESS": "Brightness",
             "CONTRAST": "Contrast",
-            "GAMMA": "Gamma"
+            "GAMMA": "Gamma",
+            "LIVE_PREVIEW": "Live preview"
         },
         "SAVE_MESSAGE": "Settings saved"
     }

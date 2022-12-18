@@ -158,6 +158,18 @@
                            [formControl]="$any(form.controls.gamma)">
                 </mat-slider>
             </div>
+
+
+        </div>
+    </div>
+
+    <div class="gswitcher-main-footer">
+        <div class="gswitcher-main-footer-live-preview">
+            <mat-slide-toggle [formControl]="livePreviewControl"
+                              color="accent"
+                              (change)="onChangeLivePreview($event)">
+                {{'MAIN.FIELDS.LIVE_PREVIEW' | translate}}
+            </mat-slide-toggle>
         </div>
     </div>
 

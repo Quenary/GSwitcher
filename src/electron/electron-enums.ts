@@ -38,7 +38,15 @@ export enum EInvokeEventName {
     /**
      * Quit app
      */
-    'gswitcher:quit' = 'gswitcher:quit'
+    'gswitcher:quit' = 'gswitcher:quit',
+    /**
+     * Set live preview settings
+     */
+    'gswitcher:set-live-preview-values' = 'gswitcher:set-live-preview-values',
+    /**
+     * Set live preview active flag
+     */
+    'gswitcher:set-live-preview-active' = 'gswitcher:set-live-preview-active'
 }
 
 export enum EAppUrls {

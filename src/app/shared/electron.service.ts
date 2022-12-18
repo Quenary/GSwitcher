@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
 import { EInvokeEventName } from 'src/electron/electron-enums';
-import type { IGSwitcherConfig } from 'src/electron/gswitcher-storage';
+import type { IGSwitcherConfig, IGSwitcherConfigApplication } from 'src/electron/gswitcher-storage';
 import { isElectron } from '../decorators/electron.decorator';
 import { IVersionCheckResponse } from '../interfaces/version-check';
 
@@ -100,5 +100,23 @@ export class ElectronService {
   @isElectron()
   public quit() {
     window.electron.invoke(EInvokeEventName['gswitcher:quit']);
+  }
+
+  /**
+   * Set values for live preview
+   * @param values values
+   */
+  @isElectron()
+  public setLivePreviewValues(values: IGSwitcherConfigApplication) {
+    window.electron.invoke(EInvokeEventName['gswitcher:set-live-preview-values'], values);
+  }
+
+  /**
+   * Set live preview active flag
+   * @param value flag
+   */
+  @isElectron()
+  public setLivePreviewActive(value: boolean) {
+    window.electron.invoke(EInvokeEventName['gswitcher:set-live-preview-active'], value);
   }
 }

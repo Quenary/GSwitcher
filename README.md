@@ -1,3 +1,8 @@
+# This project is no longer supported. You can use [the new one](https://github.com/Quenary/screen-tune)
+<br>
+<br>
+<br>
+<br>
 # GSwitcher
 ## [**Download latest release**](https://github.com/Quenary/GSwitcher/releases/latest)
 ![Alt text](/extras//screenshots/gswitcher-1.0.0-screenshot.png?raw=true "Optional Title")
